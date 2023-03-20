@@ -46,7 +46,7 @@ void test(std::string list){
             return  particles->GetCandidateMomenta();
             }, {} )
           ;
-  dd.Foreach( [](unsigned int event_id){ if event_id % 100 == 0 std::cout << event_id << std::endl; }, {"evtId" } );
+  dd.Foreach( [](unsigned int event_id){ if (event_id % 100 == 0) std::cout << event_id << std::endl; }, {"evtId" } );
 
   dd.Snapshot("t", "candidates.root", dd.GetDefinedColumnNames());
   std::cout << "Bruh" << std::endl;
