@@ -24,10 +24,12 @@ message(STATUS ${KFParticleSimple_LIB_DIR})
 
 set(SOURCES
         src/find_particles.cc
+        src/tree_manager.cc
         src/utils.cc
         )
 set(HEADERS
         src/find_particles.h
+        src/tree_manager.h
         src/utils.h
         )
 

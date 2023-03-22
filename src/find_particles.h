@@ -8,6 +8,7 @@
 #include <vector>
 #include <array>
 #include <cmath>
+#include <iostream>
 
 #include <Decay.hpp>
 #include <Daughter.hpp>
@@ -21,17 +22,16 @@
 #include <Math/Cartesian3D.h>
 #include <ROOT/RVec.hxx>
 #include <Math/GenVector/PtEtaPhiE4D.h>
+#include <TFile.h>
+#include <TTree.h>
 
 #include "utils.h"
+#include "tree_manager.h"
 
 class FindParticles {
 public:
-  FindParticles() = default;
-  FindParticles(const FindParticles& ) = default;
-  FindParticles(FindParticles&& ) = default;
+  explicit FindParticles(const std::string& out_file_name_ );
   ~FindParticles();
-  FindParticles& operator=(FindParticles&&) = default;
-  FindParticles& operator=(const FindParticles&) = default;
 
   void AddDecay( const std::string& name, int mother_pdg, std::vector<int> daughter_pdg );
   void inline Clear();
@@ -41,11 +41,16 @@ public:
             std::vector<std::vector<float>> magnetic_field,
             std::vector<int> pid_vector);
   size_t Find();
+  std::vector<float> GetCandidateMass();
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> GetCandidateMomenta();
   std::vector<std::vector<float>> GetCandidateMomentumErr();
   std::vector<int> GetCandidatePDG();
+  std::vector<int> GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,
+                             ROOT::VecOps::RVec<int> sim_ids,
+                             ROOT::VecOps::RVec<int> sim_pid);
   std::vector<std::vector<float>> GetCandidateCosines();
   std::vector<std::vector<float>> GetCandidateCosTopo();
+  std::vector<std::vector<float>> GetDaughterChi2Prim();
   std::vector<double> GetDaughterDCA();
   std::vector<double> GetDaughterDistanceToSV();
   std::vector<double> GetCandidateL();
@@ -55,8 +60,12 @@ public:
   std::vector<std::vector<float>> GetChi2Topo();
   std::vector<std::vector<float>> GetCosTopo();
   void inline SetDecays(const std::vector<Decay> &decays);
-
+  void FillOutTree(){
+    tree_manager_.Fill();
+  }
 private:
+  TreeManager tree_manager_;
+
   std::vector<Decay> decays_;
   InputContainer input_container_;
   std::vector<OutputContainer> candidates_;
