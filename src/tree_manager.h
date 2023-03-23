@@ -82,9 +82,14 @@ public:
     daughter_chi2_prim_ = daughter_chi_2_prim;
   }
 
-  void SetDaughterMomenta(
-          const std::vector<std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>>> &daughter_momenta) {
-    daughter_momenta_ = daughter_momenta;
+  void SetDaughter1Momenta(
+          const std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> &daughter_1_momenta) {
+    daughter1_momenta_ = daughter_1_momenta;
+  }
+
+  void SetDaughter2Momenta(
+          const std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> &daughter_2_momenta) {
+    daughter2_momenta_ = daughter_2_momenta;
   }
 
   void SetDaughterPid(const std::vector<std::vector<int>> &daughter_pid) {
@@ -101,7 +106,8 @@ private:
   std::unique_ptr<TTree> tree_out_;
 
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> candidate_momenta_{};
-  std::vector<std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>>> daughter_momenta_{};
+  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> daughter1_momenta_{};
+  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> daughter2_momenta_{};
   std::vector<std::vector<int>> daughter_pid_{};
   std::vector<std::vector<float>> candidate_momentum_errors_{};
   std::vector<float> candidate_mass_{};

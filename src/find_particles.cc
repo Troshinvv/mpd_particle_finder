@@ -77,7 +77,7 @@ std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> FindPart
     auto theta = atan2f(pz,pT);
     auto eta = -logf( tanf( theta/2.0f ) );
     auto E = sqrt( px*px+ py*py + pz*pz + m*m );
-    momenta.emplace_back( pT, eta, phi, m );
+    momenta.emplace_back( pT, eta, phi, E );
   }
   tree_manager_.SetCandidateMomenta(momenta);
   return momenta;
@@ -326,12 +326,14 @@ void FindParticles::WriteDaughterInfo(std::vector<std::vector<float>> track_para
       auto phi = static_cast<double>(atan2( py, px ));
       auto theta = atan2(pz,pT);
       auto eta = static_cast<double>(-log( tan( theta/2.0f ) ));
+      auto E = static_cast<double>( p*p + m*m );
 
-      daughter_momenta.back().emplace_back(pT, eta, phi, m);
+      daughter_momenta.back().emplace_back(pT, eta, phi, E);
       daughter_pid.back().push_back(pid);
     }
   }
-  tree_manager_.SetDaughterMomenta(daughter_momenta);
+  tree_manager_.SetDaughter1Momenta(daughter_momenta.at(0));
+  tree_manager_.SetDaughter2Momenta(daughter_momenta.at(1));
   tree_manager_.SetDaughterPid(daughter_pid);
 }
 
