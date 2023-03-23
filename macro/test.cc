@@ -56,6 +56,7 @@ void test(std::string list){
     particles->GetChi2Geo();
     particles->GetChi2Topo();
     particles->GetCosTopo();
+    particles->WriteDaughterInfo( track_parameters, pid_vector );
     particles->GetIsTrue(mother_id, sim_ids, sim_pid);
     particles->FillOutTree();
     if (event_id % 100 == 0) std::cout << event_id << std::endl;

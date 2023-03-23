@@ -82,6 +82,15 @@ public:
     daughter_chi2_prim_ = daughter_chi_2_prim;
   }
 
+  void SetDaughterMomenta(
+          const std::vector<std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>>> &daughter_momenta) {
+    daughter_momenta_ = daughter_momenta;
+  }
+
+  void SetDaughterPid(const std::vector<std::vector<int>> &daughter_pid) {
+    daughter_pid_ = daughter_pid;
+  }
+
   void Fill(){
     tree_out_->Fill();
   }
@@ -92,6 +101,8 @@ private:
   std::unique_ptr<TTree> tree_out_;
 
   std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> candidate_momenta_{};
+  std::vector<std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>>> daughter_momenta_{};
+  std::vector<std::vector<int>> daughter_pid_{};
   std::vector<std::vector<float>> candidate_momentum_errors_{};
   std::vector<float> candidate_mass_{};
   std::vector<int> candidate_pid_{};

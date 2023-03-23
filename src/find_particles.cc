@@ -77,6 +77,7 @@ std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> FindPart
     auto theta = atan2f(pz,pT);
     auto eta = -logf( tanf( theta/2.0f ) );
     auto E = sqrt( px*px+ py*py + pz*pz + m*m );
+    momenta.emplace_back( pT, eta, phi, m );
   }
   tree_manager_.SetCandidateMomenta(momenta);
   return momenta;
@@ -299,5 +300,38 @@ std::vector<std::vector<float>> FindParticles::GetDaughterChi2Prim() {
   }
   tree_manager_.SetDaughterChi2Prim(chi2);
   return chi2;
+}
+
+void FindParticles::WriteDaughterInfo(std::vector<std::vector<float>> track_parameters, std::vector<int> pid_vector) {
+  std::vector<std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>>> daughter_momenta{};
+  std::vector<std::vector<int>> daughter_pid{};
+  if( candidates_.empty() )
+    Find();
+  for( const auto& candidate : candidates_ ){
+    daughter_momenta.emplace_back();
+    daughter_pid.emplace_back();
+    auto daughter_id = candidate.GetDaughterIds();
+    for( int i=0; i<2; ++i ) {
+      auto pid = pid_vector.at( daughter_id.at(i) );
+      auto m = TDatabasePDG::Instance()->GetParticle(pid)->Mass();
+      auto tx = track_parameters.at(daughter_id.at(i)).at(3);
+      auto ty = track_parameters.at(daughter_id.at(i)).at(4);
+      auto qp = track_parameters.at(daughter_id.at(i)).at(5);
+
+      auto p = fabs( 1.0f / qp );
+      auto pz = sqrt( p*p / ( tx*tx + ty*ty + 1 ) );
+      auto px = tx*pz;
+      auto py = ty*pz;
+      auto pT = static_cast<double>(sqrt( px*px + py*py ));
+      auto phi = static_cast<double>(atan2( py, px ));
+      auto theta = atan2(pz,pT);
+      auto eta = static_cast<double>(-log( tan( theta/2.0f ) ));
+
+      daughter_momenta.back().emplace_back(pT, eta, phi, m);
+      daughter_pid.back().push_back(pid);
+    }
+  }
+  tree_manager_.SetDaughterMomenta(daughter_momenta);
+  tree_manager_.SetDaughterPid(daughter_pid);
 }
 

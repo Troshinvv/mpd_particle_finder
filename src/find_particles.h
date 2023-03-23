@@ -24,6 +24,7 @@
 #include <Math/GenVector/PtEtaPhiE4D.h>
 #include <TFile.h>
 #include <TTree.h>
+#include <TDatabasePDG.h>
 
 #include "utils.h"
 #include "tree_manager.h"
@@ -59,6 +60,7 @@ public:
   std::vector<std::vector<float>> GetChi2Geo();
   std::vector<std::vector<float>> GetChi2Topo();
   std::vector<std::vector<float>> GetCosTopo();
+  void WriteDaughterInfo(std::vector<std::vector<float>> track_parameters, std::vector<int> pid_vector);
   void inline SetDecays(const std::vector<Decay> &decays);
   void FillOutTree(){
     tree_manager_.Fill();
