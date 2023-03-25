@@ -122,11 +122,10 @@ std::vector<int> FindParticles::GetCandidatePDG(){
 std::vector<std::vector<float>> FindParticles::GetCandidateCosines(){
   if( candidates_.empty() )
     Find();
-  std::vector<std::vector<float>> cosines;
+  std::vector<std::vector<float>> cosines{3, std::vector<float>{}};
   for( const auto& candidate : candidates_ ){
-    cosines.emplace_back();
     for( int i=0; i<3; ++i )
-      cosines.back().emplace_back(candidate.GetCos(i));
+      cosines.at(i).push_back(candidate.GetCos(i));
   }
   tree_manager_.SetCandidateCosines(cosines);
   return cosines;
@@ -134,11 +133,10 @@ std::vector<std::vector<float>> FindParticles::GetCandidateCosines(){
 std::vector<std::vector<float>> FindParticles::GetCandidateCosTopo(){
   if( candidates_.empty() )
     Find();
-  std::vector<std::vector<float>> cosines;
+  std::vector<std::vector<float>> cosines{3, std::vector<float>{}};
   for( const auto& candidate : candidates_ ){
-    cosines.emplace_back();
     for( int i=0; i<3; ++i )
-      cosines.back().emplace_back(candidate.GetCosineTopo(i));
+      cosines.at(i).push_back(candidate.GetCosineTopo(i));
   }
   tree_manager_.SetCandidateCosTopo(cosines);
   return cosines;
@@ -196,11 +194,10 @@ std::vector<double> FindParticles::GetPrimaryToSecondaryVertexDistance(){
 std::vector<std::vector<float>> FindParticles::GetChi2Geo(){
   if( candidates_.empty() )
     Find();
-  std::vector<std::vector<float>> chi2;
+  std::vector<std::vector<float>> chi2(4, std::vector<float>{});
   for( const auto& candidate : candidates_ ){
-    chi2.emplace_back();
     for( int i=0; i<4; ++i )
-      chi2.back().emplace_back(candidate.GetChi2Geo(i));
+      chi2.at(i).push_back(candidate.GetChi2Geo(i));
   }
   tree_manager_.SetChi2Geo(chi2);
   return chi2;
@@ -208,11 +205,11 @@ std::vector<std::vector<float>> FindParticles::GetChi2Geo(){
 std::vector<std::vector<float>> FindParticles::GetChi2Topo(){
   if( candidates_.empty() )
     Find();
-  std::vector<std::vector<float>> chi2;
+  std::vector<std::vector<float>> chi2(4, std::vector<float>{});
   for( const auto& candidate : candidates_ ){
     chi2.emplace_back();
     for( int i=0; i<4; ++i )
-      chi2.back().emplace_back(candidate.GetChi2Topo(i));
+      chi2.at(i).push_back(candidate.GetChi2Topo(i));
   }
   tree_manager_.SetChi2Topo(chi2);
   return chi2;
@@ -220,11 +217,11 @@ std::vector<std::vector<float>> FindParticles::GetChi2Topo(){
 std::vector<std::vector<float>> FindParticles::GetCosTopo(){
   if( candidates_.empty() )
     Find();
-  std::vector<std::vector<float>> cosine;
+  std::vector<std::vector<float>> cosine(4, std::vector<float>{});
   for( const auto& candidate : candidates_ ){
     cosine.emplace_back();
     for( int i=0; i<4; ++i )
-      cosine.back().emplace_back(candidate.GetCosineTopo(i));
+      cosine.at(i).push_back(candidate.GetCosineTopo(i));
   }
   tree_manager_.SetCosTopo(cosine);
   return cosine;
@@ -289,13 +286,13 @@ std::vector<int> FindParticles::GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,
 }
 
 std::vector<std::vector<float>> FindParticles::GetDaughterChi2Prim() {
-  std::vector<std::vector<float>> chi2{};
   if( candidates_.empty() )
     Find();
+  std::vector<std::vector<float>> chi2(3, std::vector<float>{});
   for( const auto& candidate : candidates_ ){
     chi2.emplace_back();
     for( int i=0; i<3; ++i )
-      chi2.back().emplace_back(candidate.GetChi2Prim(i));
+      chi2.at(i).push_back(candidate.GetChi2Prim(i));
   }
   tree_manager_.SetDaughterChi2Prim(chi2);
   return chi2;
