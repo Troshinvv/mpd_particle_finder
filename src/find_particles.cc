@@ -63,10 +63,10 @@ size_t FindParticles::Find(){
   candidates_ = finder->GetCandidates();
   return candidates_.size();
 }
-std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> FindParticles::GetCandidateMomenta(){
+std::vector<ROOT::Math::PtEtaPhiMVector> FindParticles::GetCandidateMomenta(){
   if( candidates_.empty() )
     Find();
-  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> momenta;
+  std::vector<ROOT::Math::PtEtaPhiMVector> momenta;
   for( const auto& candidate : candidates_ ){
     auto m = candidate.GetMass();
     auto px = candidate.GetPx();
@@ -76,8 +76,7 @@ std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> FindPart
     auto phi = atan2f( py, px );
     auto theta = atan2f(pz,pT);
     auto eta = -logf( tanf( theta/2.0f ) );
-    auto E = sqrt( px*px+ py*py + pz*pz + m*m );
-    momenta.emplace_back( pT, eta, phi, E );
+    momenta.emplace_back( pT, eta, phi, m );
   }
   tree_manager_.SetCandidateMomenta(momenta);
   return momenta;
@@ -303,7 +302,10 @@ std::vector<std::vector<float>> FindParticles::GetDaughterChi2Prim() {
 }
 
 void FindParticles::WriteDaughterInfo(std::vector<std::vector<float>> track_parameters, std::vector<int> pid_vector) {
-  std::vector<std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>>> daughter_momenta{};
+  std::vector<std::vector<ROOT::Math::PtEtaPhiMVector>> daughter_momenta{
+          std::vector<ROOT::Math::PtEtaPhiMVector>{},
+          std::vector<ROOT::Math::PtEtaPhiMVector>{}
+  };
   std::vector<std::vector<int>> daughter_pid{};
   if( candidates_.empty() )
     Find();
@@ -328,7 +330,7 @@ void FindParticles::WriteDaughterInfo(std::vector<std::vector<float>> track_para
       auto eta = static_cast<double>(-log( tan( theta/2.0f ) ));
       auto E = static_cast<double>( p*p + m*m );
 
-      daughter_momenta.back().emplace_back(pT, eta, phi, E);
+      daughter_momenta.at(i).emplace_back(pT, eta, phi, m);
       daughter_pid.back().push_back(pid);
     }
   }

@@ -43,7 +43,7 @@ public:
             std::vector<int> pid_vector);
   size_t Find();
   std::vector<float> GetCandidateMass();
-  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> GetCandidateMomenta();
+  std::vector<ROOT::Math::PtEtaPhiMVector> GetCandidateMomenta();
   std::vector<std::vector<float>> GetCandidateMomentumErr();
   std::vector<int> GetCandidatePDG();
   std::vector<int> GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,

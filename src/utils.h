@@ -14,10 +14,10 @@ public:
   Utils() = default;
   ~Utils() = default;
 
-  static std::array<std::array<float, 5>, 6> CalculateJacobian( std::vector<float> parameters );
-  static inline std::array<std::array<float, 6>, 5> TransposeJacobian( std::array<std::array<float, 5>, 6> J );
+  static std::array<std::array<float, 6>, 6> CalculateJacobian( std::vector<float> parameters );
+  static inline std::array<std::array<float, 6>, 6> TransposeJacobian( std::array<std::array<float, 6>, 6> J );
   static std::vector<float> CalculateCovariance( std::vector<float> cov,
-                                                                  std::array<std::array<float, 5>, 6> Jacobian );
+                                                                  std::array<std::array<float, 6>, 6> Jacobian );
 };
 
 

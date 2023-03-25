@@ -60,7 +60,7 @@ void test(std::string list){
     particles->GetIsTrue(mother_id, sim_ids, sim_pid);
     particles->FillOutTree();
     if (event_id % 100 == 0) std::cout << event_id << std::endl;
-  }, {"evtId", "primary_vtx", "stsTrackParameters", "stsTrackCovMatrix", "stsTrackMagField", "pdg_vector",
+  }, {"evtId", "primary_vtx", "globalTrackParameters", "globalTrackCovMatrix", "stsTrackMagField", "pdg_vector",
       "simMotherId", "trSimIndex", "simPdg"} );
 //  dd.Snapshot("t", "candidates.root", dd.GetDefinedColumnNames());
   std::cout << "Bruh" << std::endl;

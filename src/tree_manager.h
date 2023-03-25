@@ -9,7 +9,7 @@
 #include <string>
 #include <TFile.h>
 #include <TTree.h>
-#include <Math/GenVector/PtEtaPhiE4D.h>
+#include <Math/Vector4D.h>
 #include <Math/LorentzVector.h>
 
 class TreeManager {
@@ -17,8 +17,7 @@ public:
   explicit TreeManager(const std::string &name_out_file);
   virtual ~TreeManager();
 
-  void SetCandidateMomenta(
-          const std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> &candidate_momenta) {
+  void SetCandidateMomenta(const std::vector<ROOT::Math::PtEtaPhiMVector> &candidate_momenta) {
     candidate_momenta_ = candidate_momenta;
   }
 
@@ -82,13 +81,11 @@ public:
     daughter_chi2_prim_ = daughter_chi_2_prim;
   }
 
-  void SetDaughter1Momenta(
-          const std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> &daughter_1_momenta) {
+  void SetDaughter1Momenta(const std::vector<ROOT::Math::PtEtaPhiMVector> &daughter_1_momenta) {
     daughter1_momenta_ = daughter_1_momenta;
   }
 
-  void SetDaughter2Momenta(
-          const std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> &daughter_2_momenta) {
+  void SetDaughter2Momenta(const std::vector<ROOT::Math::PtEtaPhiMVector> &daughter_2_momenta) {
     daughter2_momenta_ = daughter_2_momenta;
   }
 
@@ -105,9 +102,9 @@ private:
   std::unique_ptr<TFile> file_out_;
   std::unique_ptr<TTree> tree_out_;
 
-  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> candidate_momenta_{};
-  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> daughter1_momenta_{};
-  std::vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiE4D<double>>> daughter2_momenta_{};
+  std::vector<ROOT::Math::PtEtaPhiMVector> candidate_momenta_{};
+  std::vector<ROOT::Math::PtEtaPhiMVector> daughter1_momenta_{};
+  std::vector<ROOT::Math::PtEtaPhiMVector> daughter2_momenta_{};
   std::vector<std::vector<int>> daughter_pid_{};
   std::vector<std::vector<float>> candidate_momentum_errors_{};
   std::vector<float> candidate_mass_{};
