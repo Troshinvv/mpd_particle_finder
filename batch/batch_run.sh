@@ -25,6 +25,6 @@ date
 echo "Running particle finder ..."
 echo "/scratch1/mmamaev/bmn_particle_finder/build/find_candidates /scratch1/mmamaev/bmn_particle_finder/macro/test.cc $filelist"
 
-/scratch1/mmamaev/bmn_particle_finder/build/find_candidates /scratch1/mmamaev/bmn_particle_finder/macro/test.cc $filelist
+/scratch1/mmamaev/bmn_particle_finder/build/find_candidates /scratch1/mmamaev/bmn_particle_finder/macro/k_short.cc $filelist
 
 echo PROCESS FINISHED
