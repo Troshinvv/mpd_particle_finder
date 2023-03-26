@@ -40,7 +40,8 @@ public:
             std::vector<std::vector<float>> track_parameters,
             std::vector<std::vector<float>> covariance_matrix,
             std::vector<std::vector<float>> magnetic_field,
-            std::vector<int> pid_vector);
+            std::vector<int> pid_vector,
+            std::vector<bool> is_good_track_={});
   size_t Find();
   std::vector<float> GetCandidateMass();
   std::vector<ROOT::Math::PtEtaPhiMVector> GetCandidateMomenta();

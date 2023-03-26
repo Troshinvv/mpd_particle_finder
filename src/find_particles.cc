@@ -23,12 +23,17 @@ void FindParticles::Fill(std::vector<float> primary_vertex,
           std::vector<std::vector<float>> track_parameters,
           std::vector<std::vector<float>> covariance_matrix,
           std::vector<std::vector<float>> magnetic_field,
-          std::vector<int> pid_vector){
+          std::vector<int> pid_vector,
+          std::vector<bool> is_good_track_){
   Clear();
   input_container_.SetPV( primary_vertex.at(0), primary_vertex.at(1), primary_vertex.at(2) );
   auto n_particles = track_parameters.size();
   input_container_.Reserve( n_particles );
   for( int i=0; i<n_particles; ++i ){
+    if( !is_good_track_.empty() ){
+      if( !is_good_track_.at(i) )
+        continue;
+    }
     auto trk_parameters = track_parameters.at(i);
     auto trk_cov = covariance_matrix.at(i);
     auto trk_field = magnetic_field.at(i);
@@ -74,7 +79,7 @@ std::vector<ROOT::Math::PtEtaPhiMVector> FindParticles::GetCandidateMomenta(){
     auto pz = candidate.GetPz();
     auto pT = sqrtf( px*px + py*py );
     auto phi = atan2f( py, px );
-    auto theta = atan2f(pz,pT);
+    auto theta = atan2f( pT, pz);
     auto eta = -logf( tanf( theta/2.0f ) );
     momenta.emplace_back( pT, eta, phi, m );
   }
@@ -323,7 +328,7 @@ void FindParticles::WriteDaughterInfo(std::vector<std::vector<float>> track_para
       auto py = ty*pz;
       auto pT = static_cast<double>(sqrt( px*px + py*py ));
       auto phi = static_cast<double>(atan2( py, px ));
-      auto theta = atan2(pz,pT);
+      auto theta = atan2(pT,pz);
       auto eta = static_cast<double>(-log( tan( theta/2.0f ) ));
       auto E = static_cast<double>( p*p + m*m );
 
