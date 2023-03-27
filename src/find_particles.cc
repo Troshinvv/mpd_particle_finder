@@ -10,12 +10,12 @@ void FindParticles::AddDecay( const std::string& name, int mother_pdg, std::vect
   std::vector<Daughter> daughters;
   for( auto pdg : daughter_pdg ){
     daughters.emplace_back( pdg );
-    daughters.back().SetCutChi2Prim(0);
+    daughters.back().SetCutChi2Prim(18.42);
   }
   Mother mother(mother_pdg);
-  mother.SetCutChi2Geo(999);
+  mother.SetCutChi2Geo(3);
   mother.SetCutDistance(1);
-  mother.SetCutLdL(0);
+  mother.SetCutLdL(5);
   decays_.emplace_back( name, mother, daughters );
 }
 
