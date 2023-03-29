@@ -11,9 +11,27 @@ void k_short(std::string list){
   std::shared_ptr<FindParticles> particles = std::make_shared<FindParticles>("candidates.root");
   particles->AddDecay( "k_short", 310, {-211, 211} );
 
-  auto dd = d.Define("primary_vtx", [](double x, double y, double z){
-    return std::vector<float>{ static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
-    }, { "vtxX", "vtxY", "vtxZ"})
+  auto dd = d
+          .Define("primary_vtx", [](double x, double y, double z){
+            return std::vector<float>{
+              static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
+            },
+                  { "vtxX", "vtxY", "vtxZ"})
+          .Define("centrality", [](ROOT::VecOps::RVec<float> mom){
+            float centrality{-1.f};
+            std::vector<float> centrality_percentage{ 0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100 };
+            std::vector<int> multiplicity_edges{ 249, 118, 102, 89, 77, 67, 57, 49, 42, 29, 20, 13, 8, 4, 0 };
+            auto multiplicity = mom.size();
+            int idx = 0;
+            float bin_edge = multiplicity_edges[idx];
+            while( multiplicity < bin_edge &&
+                   idx < multiplicity_edges.size()-1 ){
+              idx++;
+              bin_edge = multiplicity_edges[idx];
+            }
+            centrality = (centrality_percentage[idx-1] + centrality_percentage[idx])/2.0f;
+            return centrality;
+          }, { "trP" })
           .Define("pdg_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg){
             std::vector<int> pdg;
             for( auto idx : sim_index ) {
