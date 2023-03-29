@@ -18,11 +18,11 @@ void test(std::string list){
             std::vector<int> pdg;
             for( auto idx : sim_index ) {
               if( idx < 0 ) {
-                pdg.push_back(-1);
+                pdg.push_back(-999);
                 continue;
               }
               if( idx > sim_pdg.size() ) {
-                pdg.push_back(-1);
+                pdg.push_back(-999);
                 continue;
               }
               pdg.push_back(sim_pdg.at(idx));

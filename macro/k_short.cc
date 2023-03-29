@@ -18,11 +18,11 @@ void k_short(std::string list){
             std::vector<int> pdg;
             for( auto idx : sim_index ) {
               if( idx < 0 ) {
-                pdg.push_back(-1);
+                pdg.push_back(-999);
                 continue;
               }
               if( idx > sim_pdg.size() ) {
-                pdg.push_back(-1);
+                pdg.push_back(-999);
                 continue;
               }
               pdg.push_back(sim_pdg.at(idx));
@@ -60,7 +60,7 @@ void k_short(std::string list){
     particles->GetIsTrue(mother_id, sim_ids, sim_pid);
     particles->FillOutTree();
     if (event_id % 100 == 0) std::cout << event_id << std::endl;
-  }, {"evtId", "primary_vtx", "globalTrackParameters", "globalTrackCovMatrix", "stsTrackMagField", "pdg_vector",
+  }, {"evtId", "primary_vtx", "stsTrackParameters", "stsTrackCovMatrix", "stsTrackMagField", "pdg_vector",
       "simMotherId", "trSimIndex", "simPdg"} );
 //  dd.Snapshot("t", "candidates.root", dd.GetDefinedColumnNames());
   std::cout << "Bruh" << std::endl;
