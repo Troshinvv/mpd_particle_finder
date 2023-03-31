@@ -93,6 +93,14 @@ public:
     daughter_pid_ = daughter_pid;
   }
 
+  void SetCentrality(float centrality) {
+    centrality_ = centrality;
+  }
+
+  void SetPrimaryVertex(const std::vector<float> &primary_vertex) {
+    primary_vertex_ = primary_vertex;
+  }
+
   void Fill(){
     tree_out_->Fill();
   }
@@ -102,6 +110,8 @@ private:
   std::unique_ptr<TFile> file_out_;
   std::unique_ptr<TTree> tree_out_;
 
+  float centrality_{};
+  std::vector<float> primary_vertex_{};
   std::vector<ROOT::Math::PtEtaPhiMVector> candidate_momenta_{};
   std::vector<ROOT::Math::PtEtaPhiMVector> daughter1_momenta_{};
   std::vector<ROOT::Math::PtEtaPhiMVector> daughter2_momenta_{};

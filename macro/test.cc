@@ -47,6 +47,7 @@ void test(std::string list){
             }, { "trSimIndex", "simPdg" })
             ;
   dd.Foreach( [particles](unsigned int event_id,
+                          float centrality,
                           std::vector<float>& primary_vertex,
                           std::vector<std::vector<float>> track_parameters,
                           std::vector<std::vector<float>> covariance_matrix,
@@ -57,6 +58,7 @@ void test(std::string list){
                           ROOT::VecOps::RVec<int> sim_pid){
     particles->Fill( primary_vertex, track_parameters, covariance_matrix, magnetic_field, pid_vector );
     particles->Find();
+    particles->WriteCentrality(centrality);
     particles->GetCandidateMomenta();
     particles->GetCandidateMass();
     particles->GetCandidateMomentumErr();
@@ -76,8 +78,16 @@ void test(std::string list){
     particles->GetIsTrue(mother_id, sim_ids, sim_pid);
     particles->FillOutTree();
     if (event_id % 100 == 0) std::cout << event_id << std::endl;
-  }, {"evtId", "primary_vtx", "stsTrackParameters", "stsTrackCovMatrix", "stsTrackMagField", "pdg_vector",
-      "simMotherId", "trSimIndex", "simPdg"} );
+  }, {"evtId",
+      "centrality",
+      "primary_vtx",
+      "stsTrackParameters",
+      "stsTrackCovMatrix",
+      "stsTrackMagField",
+      "pdg_vector",
+      "simMotherId",
+      "trSimIndex",
+      "simPdg"} );
 //  dd.Snapshot("t", "candidates.root", dd.GetDefinedColumnNames());
   std::cout << "Bruh" << std::endl;
 }

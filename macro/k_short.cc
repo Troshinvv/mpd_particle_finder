@@ -49,6 +49,7 @@ void k_short(std::string list){
             }, { "trSimIndex", "simPdg" })
             ;
   dd.Foreach( [particles](unsigned int event_id,
+                          float centrality,
                           std::vector<float>& primary_vertex,
                           std::vector<std::vector<float>> track_parameters,
                           std::vector<std::vector<float>> covariance_matrix,
@@ -78,7 +79,7 @@ void k_short(std::string list){
     particles->GetIsTrue(mother_id, sim_ids, sim_pid);
     particles->FillOutTree();
     if (event_id % 100 == 0) std::cout << event_id << std::endl;
-  }, {"evtId", "primary_vtx", "stsTrackParameters", "stsTrackCovMatrix", "stsTrackMagField", "pdg_vector",
+  }, {"evtId", "centrality", "primary_vtx", "stsTrackParameters", "stsTrackCovMatrix", "stsTrackMagField", "pdg_vector",
       "simMotherId", "trSimIndex", "simPdg"} );
 //  dd.Snapshot("t", "candidates.root", dd.GetDefinedColumnNames());
   std::cout << "Bruh" << std::endl;

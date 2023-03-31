@@ -61,6 +61,7 @@ public:
   std::vector<std::vector<float>> GetChi2Geo();
   std::vector<std::vector<float>> GetChi2Topo();
   std::vector<std::vector<float>> GetCosTopo();
+  void WriteCentrality( float centrality ){ tree_manager_.SetCentrality(centrality); }
   void WriteDaughterInfo(std::vector<std::vector<float>> track_parameters, std::vector<int> pid_vector);
   void inline SetDecays(const std::vector<Decay> &decays);
   void FillOutTree(){

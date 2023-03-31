@@ -26,6 +26,7 @@ void FindParticles::Fill(std::vector<float> primary_vertex,
           std::vector<int> pid_vector,
           std::vector<bool> is_good_track_){
   Clear();
+  tree_manager_.SetPrimaryVertex(primary_vertex);
   input_container_.SetPV( primary_vertex.at(0), primary_vertex.at(1), primary_vertex.at(2) );
   auto n_particles = track_parameters.size();
   input_container_.Reserve( n_particles );

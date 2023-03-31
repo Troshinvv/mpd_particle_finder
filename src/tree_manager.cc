@@ -9,6 +9,8 @@ TreeManager::TreeManager(const std::string &name_out_file) : name_out_file_(name
   file_out_->cd();
   tree_out_ = std::make_unique<TTree>( "t", "candidates" );
 
+  tree_out_->Branch( "centrality", &centrality_ );
+  tree_out_->Branch( "primary_vertex_", &primary_vertex_ );
   tree_out_->Branch( "candidate_momenta", &candidate_momenta_ );
   tree_out_->Branch( "daughter1_momenta", &daughter1_momenta_ );
   tree_out_->Branch( "daughter2_momenta", &daughter2_momenta_ );
