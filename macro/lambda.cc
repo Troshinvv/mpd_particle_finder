@@ -2,7 +2,7 @@
 // Created by Misha on 3/15/2023.
 //
 
-void test(std::string list){
+void lambda(std::string list){
   TFileCollection collection( "collection", "", list.c_str() );
   auto* chain = new TChain( "t" );
   chain->AddFileInfoList( collection.GetList() );

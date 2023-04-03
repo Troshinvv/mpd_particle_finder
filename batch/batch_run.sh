@@ -23,9 +23,10 @@ source /scratch1/mmamaev/bmnroot-gitlab/build/config.sh
 echo
 date
 echo "Running particle finder ..."
-echo "/scratch1/mmamaev/bmn_particle_finder/build/find_candidates /scratch1/mmamaev/bmn_particle_finder/macro/test.cc $filelist"
+echo "/scratch1/mmamaev/bmn_particle_finder/build/find_candidates /scratch1/mmamaev/bmn_particle_finder/macro/lambda.cc $filelist"
 
-/scratch1/mmamaev/bmn_particle_finder/build/find_candidates /scratch1/mmamaev/bmn_particle_finder/macro/test.cc $filelist
-root -q /scratch1/mmamaev/bmn_particle_finder/macro/lambda_qa.cc
+time /scratch1/mmamaev/bmn_particle_finder/build/find_candidates /scratch1/mmamaev/bmn_particle_finder/macro/lambda.cc $filelist
+time root -q /scratch1/mmamaev/bmn_particle_finder/macro/rec_lambda_qa.cc
+time root -q /scratch1/mmamaev/bmn_particle_finder/macro/tru_lambda_qa.cc"(\"${filelist}\")"
 
 echo PROCESS FINISHED
