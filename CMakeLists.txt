@@ -44,7 +44,7 @@ include_directories(
 add_library(Finder SHARED ${SOURCES} G__Finder.cxx )
 ROOT_GENERATE_DICTIONARY( G__Finder ${HEADERS} LINKDEF src/FinderLinkDef.h)
 add_target_property(Finder COMPILE_FLAGS "-DDO_TPCCATRACKER_EFF_PERFORMANCE -DNonhomogeneousField -DCBM -DUSE_TIMERS")
-target_link_libraries(Finder PUBLIC KFParticle Vc KFParticleSimple KFParticleInterface ROOT::RIO ROOT::Tree ROOT::EG)
+target_link_libraries(Finder PUBLIC KFParticle Vc KFParticleSimple KFParticleInterface ROOT::RIO ROOT::Tree ROOT::EG ROOT::ROOTNTuple)
 
 add_executable(find_candidates src/main.cc)
 add_target_property(find_candidates COMPILE_FLAGS "-DDO_TPCCATRACKER_EFF_PERFORMANCE -DNonhomogeneousField -DCBM -DUSE_TIMERS")
