@@ -266,13 +266,25 @@ std::vector<int> FindParticles::GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,
       continue;
     }
 
-    auto match1 = sim_ids.at( daughter1 );
-    auto match2 = sim_ids.at( daughter2 );
+    int match1{-1};
+    int match2{-1};
+    try {
+      match1 = sim_ids.at(daughter1);
+      match2 = sim_ids.at(daughter2);
+    } catch(const std::exception& e){
+      std::cerr << "The exception was thrown attempting to access the sim_ids vector " << __func__ <<"\n";
+      throw e.what();
+    }
 
-
-    auto mother_id1 = mother_ids.at( match1 );
-    auto mother_id2 = mother_ids.at( match2 );
-
+    int mother_id1{-1};
+    int mother_id2{-1};
+    try {
+      mother_id1 = mother_ids.at(match1);
+      mother_id2 = mother_ids.at(match2);
+    } catch(const std::exception& e){
+      std::cerr << "The exception was thrown attempting to access the mother_ids vector " << __func__ <<"\n";
+      throw e.what();
+    }
     if( mother_id1 != mother_id2 ){
       true_pdg.push_back(-1);
       continue;
@@ -285,7 +297,12 @@ std::vector<int> FindParticles::GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,
       true_pdg.push_back(-1);
       continue;
     }
-    true_pdg.push_back( sim_pid.at( mother_id1 ) );
+    try {
+      true_pdg.push_back(sim_pid.at(mother_id1));
+    } catch(const std::exception& e){
+      std::cerr << "The exception was thrown attempting to access the sim_pid vector " << __func__ <<"\n";
+      throw e.what();
+    }
   }
   tree_manager_.SetCandidateTruePid(true_pdg);
   return true_pdg;
