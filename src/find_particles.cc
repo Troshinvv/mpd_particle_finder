@@ -261,7 +261,7 @@ std::vector<int> FindParticles::GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,
       true_pdg.push_back(-1);
       continue;
     }
-    if( daughter1 > sim_ids.size() ){
+    if( daughter2 > sim_ids.size() ){
       true_pdg.push_back(-1);
       continue;
     }

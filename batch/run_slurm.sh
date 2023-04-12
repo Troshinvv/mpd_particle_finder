@@ -20,4 +20,6 @@ cd $id
 source /mnt/pool/nica/7/mam2mih/soft/basov/fairsoft/install/bin/thisroot.sh
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/mnt/pool/nica/7/mam2mih/soft/basov/PFSimple/install/lib/:/mnt/pool/nica/7/mam2mih/soft/basov/PFSimple/install/external/lib
 
+echo "/mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/build/find_candidates /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/lambda.cc $list_dir/$file_list"
+
 /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/build/find_candidates /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/lambda.cc $list_dir/$file_list
