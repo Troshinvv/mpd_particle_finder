@@ -4,10 +4,12 @@
 
 #include "tree_manager.h"
 
-TreeManager::TreeManager(const std::string &name_out_file) : name_out_file_(name_out_file) {
-  file_out_ = std::make_unique<TFile>( name_out_file_.c_str(), "RECREATE"  );
+#include <utility>
+
+TreeManager::TreeManager(std::string name_out_file) : name_out_file_(std::move(name_out_file)) {
+  file_out_ = TFile::Open(name_out_file_.c_str(), "RECREATE");
   file_out_->cd();
-  tree_out_ = std::make_unique<TTree>( "t", "candidates" );
+  tree_out_ = new TTree( "t", "candidates" );
 
   tree_out_->Branch( "centrality", &centrality_ );
   tree_out_->Branch( "primary_vertex_", &primary_vertex_ );

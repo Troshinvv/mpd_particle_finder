@@ -14,7 +14,7 @@
 
 class TreeManager {
 public:
-  explicit TreeManager(const std::string &name_out_file);
+  explicit TreeManager(std::string name_out_file);
   virtual ~TreeManager();
 
   void SetCandidateMomenta(const std::vector<ROOT::Math::PtEtaPhiMVector> &candidate_momenta) {
@@ -107,8 +107,8 @@ public:
 
 private:
   std::string name_out_file_;
-  std::unique_ptr<TFile> file_out_;
-  std::unique_ptr<TTree> tree_out_;
+  TFile* file_out_{nullptr};
+  TTree* tree_out_{nullptr};
 
   float centrality_{};
   std::vector<float> primary_vertex_{};
