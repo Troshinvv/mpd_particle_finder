@@ -69,7 +69,7 @@ void FindParticles::Fill(std::vector<float> primary_vertex,
   std::cout << "pid_vector.size() = " << pid_vector.size() << "\n";
   std::cout << "is_good_track.size() = " << is_good_track_.size() << "\n";
 
-  throw e.what();
+  throw e;
 }
 
 size_t FindParticles::Find() try {
@@ -81,7 +81,7 @@ size_t FindParticles::Find() try {
   return candidates_.size();
 } catch ( std::exception &e ){
   std::cout << __func__ << "(): Exception is issued" << "\n";
-  throw e.what();
+  throw e;
 }
 std::vector<ROOT::Math::PtEtaPhiMVector> FindParticles::GetCandidateMomenta(){
   if( candidates_.empty() )
@@ -304,7 +304,7 @@ std::vector<int> FindParticles::GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,
   return true_pdg;
 } catch ( std::exception &e ){
   std::cout << __func__ << "(): Exception is issued" << "\n";
-  throw e.what();
+  throw e;
 }
 
 std::vector<std::vector<float>> FindParticles::GetDaughterChi2Prim() {
