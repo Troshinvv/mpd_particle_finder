@@ -42,7 +42,7 @@ include_directories(
         ${KFParticleInterface_INCLUDE_DIR})
 #
 add_library(Finder SHARED ${SOURCES} G__Finder.cxx )
-ROOT_GENERATE_DICTIONARY( G__Finder ${HEADERS} LINKDEF src/FinderLinkDef.h OPTIONS "-DDO_TPCCATRACKER_EFF_PERFORMANCE -DNonhomogeneousField -DCBM -DUSE_TIMERS")
+ROOT_GENERATE_DICTIONARY( G__Finder ${HEADERS} LINKDEF src/FinderLinkDef.h OPTIONS -DDO_TPCCATRACKER_EFF_PERFORMANCE -DNonhomogeneousField -DCBM -DUSE_TIMERS)
 add_target_property(Finder COMPILE_FLAGS "-DDO_TPCCATRACKER_EFF_PERFORMANCE -DNonhomogeneousField -DCBM -DUSE_TIMERS")
 target_link_libraries(Finder PUBLIC KFParticle Vc KFParticleSimple KFParticleInterface ROOT::RIO ROOT::Tree ROOT::EG ROOT::ROOTNTuple)
 
