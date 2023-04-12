@@ -24,7 +24,7 @@ void FindParticles::Fill(std::vector<float> primary_vertex,
           std::vector<std::vector<float>> covariance_matrix,
           std::vector<std::vector<float>> magnetic_field,
           std::vector<int> pid_vector,
-          std::vector<bool> is_good_track_){
+          std::vector<bool> is_good_track_) try {
   Clear();
   tree_manager_.SetPrimaryVertex(primary_vertex);
   input_container_.SetPV( primary_vertex.at(0), primary_vertex.at(1), primary_vertex.at(2) );
@@ -59,15 +59,29 @@ void FindParticles::Fill(std::vector<float> primary_vertex,
     input_container_.AddTrack( par, new_cov, trk_field, static_cast<int>(q), trk_pid, i );
   }
 //  out_tree_->Fill();
+} catch ( std::exception &e ){
+  std::cout << __func__ << "(): Exception is issued" << "\n";
+  std::cout << "Input parameters are:" << "\n";
+  std::cout << "primary_vertex.size() = " << primary_vertex.size() << "\n";
+  std::cout << "track_parameters.size() = " << track_parameters.size() << "\n";
+  std::cout << "covariance_matrix.size() = " << covariance_matrix.size() << "\n";
+  std::cout << "magnetic_field.size() = " << magnetic_field.size() << "\n";
+  std::cout << "pid_vector.size() = " << pid_vector.size() << "\n";
+  std::cout << "is_good_track.size() = " << is_good_track_.size() << "\n";
+
+  throw e.what();
 }
 
-size_t FindParticles::Find(){
+size_t FindParticles::Find() try {
   std::unique_ptr<SimpleFinder> finder = std::make_unique<SimpleFinder>();
   finder->SetDecays(decays_);
   finder->Init(input_container_);
   finder->FindParticles();
   candidates_ = finder->GetCandidates();
   return candidates_.size();
+} catch ( std::exception &e ){
+  std::cout << __func__ << "(): Exception is issued" << "\n";
+  throw e.what();
 }
 std::vector<ROOT::Math::PtEtaPhiMVector> FindParticles::GetCandidateMomenta(){
   if( candidates_.empty() )
@@ -249,7 +263,7 @@ FindParticles::~FindParticles() {
 
 std::vector<int> FindParticles::GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,
                                           ROOT::VecOps::RVec<int> sim_ids,
-                                          ROOT::VecOps::RVec<int> sim_pid) {
+                                          ROOT::VecOps::RVec<int> sim_pid) try {
   std::vector<int> true_pdg;
   for( const auto& cand : candidates_ ){
     auto daughters_id = cand.GetDaughterIds();
@@ -257,34 +271,21 @@ std::vector<int> FindParticles::GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,
     auto daughter1 = daughters_id.at(0);
     auto daughter2 = daughters_id.at(1);
 
-    if( daughter1 > sim_ids.size() ){
+    if( daughter1 >= sim_ids.size() ){
       true_pdg.push_back(-1);
       continue;
     }
-    if( daughter2 > sim_ids.size() ){
+    if( daughter2 >= sim_ids.size() ){
       true_pdg.push_back(-1);
       continue;
     }
 
-    int match1{-1};
-    int match2{-1};
-    try {
-      match1 = sim_ids.at(daughter1);
-      match2 = sim_ids.at(daughter2);
-    } catch(const std::exception& e){
-      std::cerr << "The exception was thrown attempting to access the sim_ids vector " << __func__ <<"\n";
-      throw e.what();
-    }
+    auto match1 = sim_ids.at(daughter1);
+    auto match2 = sim_ids.at(daughter2);
 
-    int mother_id1{-1};
-    int mother_id2{-1};
-    try {
-      mother_id1 = mother_ids.at(match1);
-      mother_id2 = mother_ids.at(match2);
-    } catch(const std::exception& e){
-      std::cerr << "The exception was thrown attempting to access the mother_ids vector " << __func__ <<"\n";
-      throw e.what();
-    }
+    auto mother_id1 = mother_ids.at(match1);
+    auto mother_id2 = mother_ids.at(match2);
+
     if( mother_id1 != mother_id2 ){
       true_pdg.push_back(-1);
       continue;
@@ -293,19 +294,17 @@ std::vector<int> FindParticles::GetIsTrue(ROOT::VecOps::RVec<int> mother_ids,
       true_pdg.push_back(-1);
       continue;
     }
-    if ( mother_id1 > sim_pid.size() ){
+    if ( mother_id1 >= sim_pid.size() ){
       true_pdg.push_back(-1);
       continue;
     }
-    try {
-      true_pdg.push_back(sim_pid.at(mother_id1));
-    } catch(const std::exception& e){
-      std::cerr << "The exception was thrown attempting to access the sim_pid vector " << __func__ <<"\n";
-      throw e.what();
-    }
+    true_pdg.push_back(sim_pid.at(mother_id1));
   }
   tree_manager_.SetCandidateTruePid(true_pdg);
   return true_pdg;
+} catch ( std::exception &e ){
+  std::cout << __func__ << "(): Exception is issued" << "\n";
+  throw e.what();
 }
 
 std::vector<std::vector<float>> FindParticles::GetDaughterChi2Prim() {

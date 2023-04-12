@@ -37,7 +37,7 @@ void lambda(std::string list){
                 pdg.push_back(-999);
                 continue;
               }
-              if( idx > sim_pdg.size() ) {
+              if( idx >= sim_pdg.size() ) {
                 pdg.push_back(-999);
                 continue;
               }
