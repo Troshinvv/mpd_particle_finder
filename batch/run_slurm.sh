@@ -23,3 +23,4 @@ export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/mnt/pool/nica/7/mam2mih/soft/basov/PFSi
 echo "/mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/build/find_candidates /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/lambda.cc $list_dir/$file_list"
 
 time /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/build/find_candidates /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/lambda.cc $list_dir/$file_list
+time root -l -b -q /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/rec_lambda_qa.cc

@@ -138,7 +138,7 @@ void lambda_qa(){
 			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_LdL_"+cut), ";L/dL; counts", 100, 0.0, 50.0 }, "candidate_LdL", cut ) );
 			hist2d.push_back( dd.Histo2D( { std::data("h2_pT_y_"+cut), ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5  }, "candidate_rapidity", "candidate_pT", cut ) );
 	}
-	auto file_out = TFile::Open("lambda_candidates_qa.root", "recreate");
+	auto file_out = TFile::Open("qa.root", "recreate");
 	for( auto& h1 : hist1d )
 		h1->Write();
 	for( auto& h2 : hist2d )
