@@ -1,27 +1,28 @@
-void rec_lambda_qa(){
-	ROOT::RDataFrame d("t", "lambda_DCMQGSM_SMM_XeCs_3.0GeV_2023_03_31.root");
+void lambda_qa(){
+	ROOT::RDataFrame d("t", "candidates.root");
 	auto dd = d
-//      .Filter("centrality > 10.0")
-			.Define( "candidate_pT", "std::vector<float> pT; for( auto mom : candidate_momenta ){ pT.push_back( mom.Pt() ); } return pT;")
+			.Filter("10.0 < centrality")
+			.Define("candidate_pT", "std::vector<float> pT; for( auto mom : candidate_momenta ){ pT.push_back( mom.Pt() ); } return pT;")
 			.Define("candidate_phi", "std::vector<float> phi; for( auto mom : candidate_momenta ){ phi.push_back( mom.Phi() ); } return phi;")
 			.Define("candidate_rapidity", "std::vector<float> rapidity; for( auto mom : candidate_momenta ){ rapidity.push_back( mom.Rapidity() ); } return rapidity;")
 			.Define("pT_err", "std::vector<float> err; for( auto mom : candidate_momentum_errors ){ err.push_back( mom.at(0) ); } return err;")
 			.Define("phi_err", "std::vector<float> err; for( auto mom : candidate_momentum_errors ){ err.push_back( mom.at(1) ); } return err;")
 			.Define("eta_err", "std::vector<float> err; for( auto mom : candidate_momentum_errors ){ err.push_back( mom.at(2) ); } return err;")
 			.Define("m_err", "std::vector<float> err; for( auto mom : candidate_momentum_errors ){ err.push_back( mom.at(3) ); } return err;")
-			.Define("daughter1_cos", "std::vector<float> cosine; for( int i=0; i<candidate_cosines.at(0).size(); ++i ){ cosine.push_back( candidate_cosines.at(0).at(i) ); } return cosine;")
-			.Define("daughter2_cos", "std::vector<float> cosine; for( int i=0; i<candidate_cosines.at(1).size(); ++i ){ cosine.push_back( candidate_cosines.at(1).at(i) ); } return cosine;")
+			.Define("daughter1_cos", "std::vector<float> cosine; for( int i=0; i<daughter_cosines.at(0).size(); ++i ){ cosine.push_back( daughter_cosines.at(0).at(i) ); } return cosine;")
+			.Define("daughter2_cos", "std::vector<float> cosine; for( int i=0; i<daughter_cosines.at(1).size(); ++i ){ cosine.push_back( daughter_cosines.at(1).at(i) ); } return cosine;")
 			.Define("daughter1_chi2_prim", "std::vector<float> chi2; for( int i=0; i<daughter_chi2_prim.at(0).size(); ++i ){ chi2.push_back( daughter_chi2_prim.at(0).at(i) ); } return chi2;")
 			.Define("daughter2_chi2_prim", "std::vector<float> chi2; for( int i=0; i<daughter_chi2_prim.at(1).size(); ++i ){ chi2.push_back( daughter_chi2_prim.at(1).at(i) ); } return chi2;")
-			.Define("candidate_chi2_geo", "std::vector<float> chi2; for( int i=0; i<chi2_geo.at(0).size(); ++i ){ chi2.push_back( chi2_geo.at(0).at(i) ); } return chi2;")
-			.Define("candidate_chi2_topo", "std::vector<float> chi2; for( int i=0; i<chi2_topo.at(0).size(); ++i ){ chi2.push_back( chi2_topo.at(0).at(i) ); } return chi2;")
-			.Define("candidate_cosine_topo", "std::vector<float> cosine; for( int i=0; i<cos_topo_.at(0).size(); ++i ){ cosine.push_back( cos_topo_.at(0).at(i) ); } return cosine;")
 			.Define("signal", "candidate_true_pid == 3122")
 			.Define("background", "candidate_true_pid != 3122")
 			.Define("good_candidate",
 					"std::vector<int> good_candidate;"
-					"for(int i=0; i<candidate_cosines.at(0).size(); ++i){"
+					"for(int i=0; i<daughter_cosines.at(0).size(); ++i){"
 						"if( m_err.at(i) > 0.00105 ){"
+							"good_candidate.push_back(0);"
+							"continue;"
+						"}"
+						"if( candidate_pT.at(i) < 0.3 ){"
 							"good_candidate.push_back(0);"
 							"continue;"
 						"}"
@@ -37,7 +38,7 @@ void rec_lambda_qa(){
 							"good_candidate.push_back(0);"
 							"continue;"
 						"}"
-						"if( candidate_cosine_topo.at(i) < 0.9987 ){"
+						"if( candidate_cos_topo.at(i) < 0.9987 ){"
 							"good_candidate.push_back(0);"
 							"continue;"
 						"}"
@@ -108,9 +109,9 @@ void rec_lambda_qa(){
 	hist1d.push_back( dd.Histo1D( { "h1_daughter2_chi2_prim", ";#chi^{2}_{prim}^{2}; counts", 150, 0.0, 300.0 }, "daughter2_chi2_prim" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_chi2_geo", ";#chi^{2}_{geo}; counts", 150, 0.0, 5.0 }, "candidate_chi2_geo" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_chi2_topo", ";#chi^{2}_{topo}; counts", 150, 0.0, 150.0 }, "candidate_chi2_topo" ) );
-	hist1d.push_back( dd.Histo1D( { "h1_candidate_cos_topo", ";r_{#lambda}p_{#lambda}; counts", 100, 0.98, 1.0 }, "candidate_cosine_topo" ) );
+	hist1d.push_back( dd.Histo1D( { "h1_candidate_cos_topo", ";r_{#lambda}p_{#lambda}; counts", 100, 0.98, 1.0 }, "candidate_cos_topo" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_daughter_dca", ";DCA; counts", 100, 0.0, 0.5 }, "daughter_dca" ) );
-	hist1d.push_back( dd.Histo1D( { "h1_daughter_distance_to_sv", ";DCA_{prim}; counts", 100, 0.0, 10.0 }, "daughter_distance_to_sv" ) );
+	hist1d.push_back( dd.Histo1D( { "h1_daughter_distance_to_sv", ";DCA_{prim}; counts", 100, 0.0, 10.0 }, "distance_to_sv" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_L", ";L; counts", 100, 0.0, 20.0 }, "candidate_L" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_LdL", ";L/dL; counts", 100, 0.0, 20.0 }, "candidate_LdL" ) );
 	hist2d.push_back( dd.Histo2D( { "h2_pT_y", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5  }, "candidate_rapidity", "candidate_pT" ) );
@@ -130,14 +131,14 @@ void rec_lambda_qa(){
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_chi2_prim_"+cut), ";#chi^{2}_{prim}^{2}; counts", 150, 0.0, 600.0 }, "daughter2_chi2_prim", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_geo_"+cut), ";#chi^{2}_{geo}; counts", 150, 0.0, 5.0 }, "candidate_chi2_geo", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_topo_"+cut), ";#chi^{2}_{topo}; counts", 150, 0.0, 150.0 }, "candidate_chi2_topo", cut ) );
-			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_cos_topo_"+cut), ";r_{#lambda}p_{#lambda}; counts", 100, 0.98, 1.0 }, "candidate_cosine_topo", cut ) );
+			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_cos_topo_"+cut), ";r_{#lambda}p_{#lambda}; counts", 100, 0.98, 1.0 }, "candidate_cos_topo", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter_dca_"+cut), ";DCA; counts", 100, 0.0, 0.5 }, "daughter_dca", cut ) );
-			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter_distance_to_sv_"+cut), ";DCA_{prim}; counts", 100, 0.0, 10.0 }, "daughter_distance_to_sv", cut ) );
+			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter_distance_to_sv_"+cut), ";DCA_{prim}; counts", 100, 0.0, 10.0 }, "distance_to_sv", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_L_"+cut), ";L; counts", 100, 0.0, 50.0 }, "candidate_L", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_LdL_"+cut), ";L/dL; counts", 100, 0.0, 50.0 }, "candidate_LdL", cut ) );
 			hist2d.push_back( dd.Histo2D( { std::data("h2_pT_y_"+cut), ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5  }, "candidate_rapidity", "candidate_pT", cut ) );
 	}
-	auto file_out = TFile::Open("rec_lambda_qa.root", "recreate");
+	auto file_out = TFile::Open("lambda_candidates_qa.root", "recreate");
 	for( auto& h1 : hist1d )
 		h1->Write();
 	for( auto& h2 : hist2d )

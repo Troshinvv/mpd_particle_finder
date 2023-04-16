@@ -24,13 +24,14 @@ message(STATUS ${KFParticleSimple_LIB_DIR})
 
 set(SOURCES
         src/find_particles.cc
-        src/tree_manager.cc
         src/utils.cc
+        src/finder.cc
         )
 set(HEADERS
         src/find_particles.h
-        src/tree_manager.h
         src/utils.h
+        src/finder.h
+        src/getters.h
         )
 
 link_directories(${Vc_LIB_DIR})
@@ -44,7 +45,7 @@ include_directories(
 add_library(Finder SHARED ${SOURCES} G__Finder.cxx )
 ROOT_GENERATE_DICTIONARY( G__Finder ${HEADERS} LINKDEF src/FinderLinkDef.h OPTIONS -DDO_TPCCATRACKER_EFF_PERFORMANCE -DNonhomogeneousField -DCBM -DUSE_TIMERS)
 add_target_property(Finder COMPILE_FLAGS "-DDO_TPCCATRACKER_EFF_PERFORMANCE -DNonhomogeneousField -DCBM -DUSE_TIMERS")
-target_link_libraries(Finder PUBLIC KFParticle Vc KFParticleSimple KFParticleInterface ROOT::RIO ROOT::Tree ROOT::EG ROOT::ROOTNTuple)
+target_link_libraries(Finder PUBLIC KFParticle Vc KFParticleSimple KFParticleInterface ROOT::RIO ROOT::Tree ROOT::EG ROOT::ROOTNTuple ROOT::GenVector ROOT::TMVA)
 
 add_executable(find_candidates src/main.cc)
 add_target_property(find_candidates COMPILE_FLAGS "-DDO_TPCCATRACKER_EFF_PERFORMANCE -DNonhomogeneousField -DCBM -DUSE_TIMERS")
