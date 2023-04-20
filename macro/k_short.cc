@@ -3,7 +3,7 @@
 //
 
 
-void lambda(std::string list){
+void k_short(std::string list){
   TFileCollection collection( "collection", "", list.c_str() );
   auto* chain = new TChain( "t" );
   chain->AddFileInfoList( collection.GetList() );
