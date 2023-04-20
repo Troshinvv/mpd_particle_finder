@@ -46,7 +46,7 @@ void k_short(std::string list){
             .Define("is_good_track", [](std::vector<int> pdg_vector){
             std::vector<int> is_good;
             for( auto pid : pdg_vector ) {
-              if(pid == 2212) {
+              if( pid == 211 ) {
                 is_good.push_back(1);
                 continue;
               }

@@ -13,8 +13,8 @@ void rec_k_short_qa(){
 			.Define("daughter2_cos", "std::vector<float> cosine; for( int i=0; i<daughter_cosines.at(1).size(); ++i ){ cosine.push_back( daughter_cosines.at(1).at(i) ); } return cosine;")
 			.Define("daughter1_chi2_prim", "std::vector<float> chi2; for( int i=0; i<daughter_chi2_prim.at(0).size(); ++i ){ chi2.push_back( daughter_chi2_prim.at(0).at(i) ); } return chi2;")
 			.Define("daughter2_chi2_prim", "std::vector<float> chi2; for( int i=0; i<daughter_chi2_prim.at(1).size(); ++i ){ chi2.push_back( daughter_chi2_prim.at(1).at(i) ); } return chi2;")
-			.Define("signal", "candidate_true_pid == 3122")
-			.Define("background", "candidate_true_pid != 3122")
+			.Define("signal", "candidate_true_pid == 310")
+			.Define("background", "candidate_true_pid != 310")
 			.Define("good_candidate",
 					"std::vector<int> good_candidate;"
 					"for(int i=0; i<daughter_cosines.at(0).size(); ++i){"
