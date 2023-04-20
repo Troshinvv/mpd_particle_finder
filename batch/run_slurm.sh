@@ -20,7 +20,7 @@ cd $id
 source /mnt/pool/nica/7/mam2mih/soft/basov/fairsoft/install/bin/thisroot.sh
 export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:/mnt/pool/nica/7/mam2mih/soft/basov/PFSimple/install/lib/:/mnt/pool/nica/7/mam2mih/soft/basov/PFSimple/install/external/lib
 
-echo "/mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/build/find_candidates /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/lambda.cc $list_dir/$file_list"
+echo "/mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/build/find_candidates /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/k_short.cc $list_dir/$file_list"
 
-time /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/build/find_candidates /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/lambda.cc $list_dir/$file_list
-time root -l -b -q /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/rec_lambda_qa.cc
+time /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/build/find_candidates /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/k_short.cc $list_dir/$file_list
+time root -l -b -q /mnt/pool/nica/7/mam2mih/soft/basov/bmn_particle_finder/macro/rec_k_short_qa.cc

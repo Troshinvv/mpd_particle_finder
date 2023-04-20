@@ -1,4 +1,4 @@
-void lambda_qa(){
+void rec_lambda_qa(){
 	ROOT::RDataFrame d("t", "candidates.root");
 	auto dd = d
 			.Filter("10.0 < centrality")
