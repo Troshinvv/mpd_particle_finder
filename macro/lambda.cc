@@ -82,7 +82,8 @@ void lambda(std::string list){
           .Define("candidate_LdL", Getters::GetLdL, {"candidates"} )
           .Define("candidate_chi2_geo", Getters::GetChi2Geo, {"candidates"} )
           .Define("candidate_chi2_topo", Getters::GetChi2Topo, {"candidates"} )
-          .Define( "candidate_true_pid", Getters::GetTruePDG, {
+          .Define("daughter_id", Getters::GetDaughterId, {"candidates"} )
+          .Define("candidate_true_pid", Getters::GetTruePDG, {
                   "candidates",
                   "simMotherId",
                   "trSimIndex",

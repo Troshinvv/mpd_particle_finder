@@ -1,7 +1,8 @@
 void rec_lambda_qa(){
 	ROOT::RDataFrame d("t", "candidates.root");
 	auto dd = d
-			.Filter("10.0 < centrality")
+			.Filter("10.0 < centrality && centrality < 40.0")
+			.Define("candidate_p", "std::vector<float> p; for( auto mom : candidate_momenta ){ p.push_back( mom.P() ); } return p;")
 			.Define("candidate_pT", "std::vector<float> pT; for( auto mom : candidate_momenta ){ pT.push_back( mom.Pt() ); } return pT;")
 			.Define("candidate_phi", "std::vector<float> phi; for( auto mom : candidate_momenta ){ phi.push_back( mom.Phi() ); } return phi;")
 			.Define("candidate_rapidity", "std::vector<float> rapidity; for( auto mom : candidate_momenta ){ rapidity.push_back( mom.Rapidity() ); } return rapidity;")
@@ -13,6 +14,23 @@ void rec_lambda_qa(){
 			.Define("daughter2_cos", "std::vector<float> cosine; for( int i=0; i<daughter_cosines.at(1).size(); ++i ){ cosine.push_back( daughter_cosines.at(1).at(i) ); } return cosine;")
 			.Define("daughter1_chi2_prim", "std::vector<float> chi2; for( int i=0; i<daughter_chi2_prim.at(0).size(); ++i ){ chi2.push_back( daughter_chi2_prim.at(0).at(i) ); } return chi2;")
 			.Define("daughter2_chi2_prim", "std::vector<float> chi2; for( int i=0; i<daughter_chi2_prim.at(1).size(); ++i ){ chi2.push_back( daughter_chi2_prim.at(1).at(i) ); } return chi2;")
+      .Define("daughter1_p",
+              "std::vector<float> mom;\n"
+              "for( auto d_id : daughter_id.at(0) ){\n"
+              " auto p = stsTrackMomentum.at(d_id).P();\n"
+              " mom.push_back(p);\n"
+              "}\n"
+              "return mom;")
+			.Define("daughter2_p",
+              "std::vector<float> mom;\n"
+              "for( auto d_id : daughter_id.at(1) ){\n"
+              " auto p = stsTrackMomentum.at(d_id).P();\n"
+              " mom.push_back(p);\n"
+              "}\n"
+              "return mom;")
+      .Define( "daughters_prat", "std::vector<float> prat; for( int i=0; i<daughter1_p.size();++i){ prat.push_back( daughter2_p.at(i) / daughter1_p.at(i) ); } return prat;" )
+      .Define( "daughter1_prat", "std::vector<float> prat; for( int i=0; i<daughter1_p.size();++i){ prat.push_back( daughter1_p.at(i) / candidate_p.at(i) ); } return prat;" )
+      .Define( "daughter2_prat", "std::vector<float> prat; for( int i=0; i<daughter2_p.size();++i){ prat.push_back( daughter2_p.at(i) / candidate_p.at(i) ); } return prat;" )
 			.Define("signal", "candidate_true_pid == 3122")
 			.Define("background", "candidate_true_pid != 3122")
 			.Define("good_candidate",
@@ -107,6 +125,9 @@ void rec_lambda_qa(){
 	hist1d.push_back( dd.Histo1D( { "h1_daughter2_cos", ";cos(#varphi_{2}); counts", 100, 0.98, 1.0 }, "daughter2_cos" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_daughter1_chi2_prim", ";#chi^{2}_{prim}^{1}; counts", 150, 0.0, 300.0 }, "daughter1_chi2_prim" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_daughter2_chi2_prim", ";#chi^{2}_{prim}^{2}; counts", 150, 0.0, 300.0 }, "daughter2_chi2_prim" ) );
+	hist1d.push_back( dd.Histo1D( { "h1_daughters_prat", ";p_{d1}/p_{d2}; counts", 200, 0.0, 1.0 }, "daughters_prat" ) );
+	hist1d.push_back( dd.Histo1D( { "h1_daughter1_prat", ";p_{d1}/p_{c}; counts", 200, 0.0, 1.0 }, "daughter1_prat" ) );
+	hist1d.push_back( dd.Histo1D( { "h1_daughter2_prat", ";p_{d2}/p_{c}; counts", 200, 0.0, 1.0 }, "daughter2_prat" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_chi2_geo", ";#chi^{2}_{geo}; counts", 150, 0.0, 5.0 }, "candidate_chi2_geo" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_chi2_topo", ";#chi^{2}_{topo}; counts", 150, 0.0, 150.0 }, "candidate_chi2_topo" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_cos_topo", ";r_{#lambda}p_{#lambda}; counts", 100, 0.98, 1.0 }, "candidate_cos_topo" ) );
@@ -129,7 +150,10 @@ void rec_lambda_qa(){
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_cos_"+cut), ";cos(#varphi_{2}); counts", 100, 0.98, 1.0 }, "daughter2_cos", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter1_chi2_prim_"+cut), ";#chi^{2}_{prim}^{1}; counts", 150, 0.0, 600.0 }, "daughter1_chi2_prim", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_chi2_prim_"+cut), ";#chi^{2}_{prim}^{2}; counts", 150, 0.0, 600.0 }, "daughter2_chi2_prim", cut ) );
-			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_geo_"+cut), ";#chi^{2}_{geo}; counts", 150, 0.0, 5.0 }, "candidate_chi2_geo", cut ) );
+      hist1d.push_back( dd.Histo1D( { std::data("h1_daughters_prat_"+cut), ";p_{d1}/p_{d2}; counts", 200, 0.0, 1.0 }, "daughters_prat", cut ) );
+      hist1d.push_back( dd.Histo1D( { std::data("h1_daughter1_prat_"+cut), ";p_{d1}/p_{c}; counts", 200, 0.0, 1.0 }, "daughter1_prat", cut ) );
+      hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_prat"+cut), ";p_{d2}/p_{c}; counts", 200, 0.0, 1.0 }, "daughter2_prat", cut ) );
+      hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_geo_"+cut), ";#chi^{2}_{geo}; counts", 150, 0.0, 5.0 }, "candidate_chi2_geo", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_topo_"+cut), ";#chi^{2}_{topo}; counts", 150, 0.0, 150.0 }, "candidate_chi2_topo", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_cos_topo_"+cut), ";r_{#lambda}p_{#lambda}; counts", 100, 0.98, 1.0 }, "candidate_cos_topo", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter_dca_"+cut), ";DCA; counts", 100, 0.0, 0.5 }, "daughter_dca", cut ) );

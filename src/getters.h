@@ -190,6 +190,22 @@ inline auto GetTruePDG( const ROOT::RVec<OutputContainer>& candidates,
   throw e;
 }
 
+inline auto GetDaughterId( const ROOT::RVec<OutputContainer>& candidates ){
+  std::vector<std::vector<int>> indices{ 2, std::vector<int>{} };
+
+  for( const auto& candidate : candidates ){
+    auto daughters_id = candidate.GetDaughterIds();
+
+    const auto daughter1 = daughters_id.at(0);
+    const auto daughter2 = daughters_id.at(1);
+
+    indices.at(0).emplace_back( daughter1 );
+    indices.at(1).emplace_back( daughter2 );
+  }
+  return indices;
+}
+
+
 
 }
 
