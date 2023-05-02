@@ -72,7 +72,6 @@ void test_lambda(std::string list){
                 is_good.push_back(0);
                 continue;
               }
-              std::cout << "good track" << std::endl;
               is_good.push_back(1);
             }
             return is_good;
