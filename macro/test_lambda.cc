@@ -49,6 +49,7 @@ void test_lambda(std::string list){
                     ROOT::VecOps::RVec<int> sim_mother_id
                     ){
             std::vector<int> is_good;
+            is_good.reserve( sim_idx.size() );
             for( auto idx : sim_idx ) {
               if( idx < 0 ){
                 is_good.push_back(0);
