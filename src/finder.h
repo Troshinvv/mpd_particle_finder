@@ -25,16 +25,12 @@ public:
     std::vector<Daughter> daughters;
     for( auto pdg : daughter_pdg ){
       daughters.emplace_back( pdg );
-//      daughters.back().SetCutChi2Prim(18.42);
       daughters.back().CancelCutChi2Prim();
       daughters.back().CancelCutCos();
     }
     Mother mother(mother_pdg);
-//    mother.SetCutChi2Geo(3);
     mother.CancelCutChi2Geo();
-//    mother.SetCutDistance(1);
     mother.CancelCutDistance();
-//    mother.SetCutLdL(5);
     mother.CancelCutLdL();
     mother.CancelCutDistanceToSV();
     decays_.emplace_back( name, mother, daughters );
