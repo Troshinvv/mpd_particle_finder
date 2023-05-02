@@ -49,7 +49,7 @@ void test_lambda(std::string list){
                     ROOT::VecOps::RVec<int> sim_mother_id
                     ){
             std::vector<int> is_good;
-            for( auto idx : sim_mother_id ) {
+            for( auto idx : sim_idx ) {
               if( idx < 0 ){
                 is_good.push_back(0);
                 continue;
@@ -72,6 +72,7 @@ void test_lambda(std::string list){
                 is_good.push_back(0);
                 continue;
               }
+              std::cout << "good track" << std::endl;
               is_good.push_back(1);
             }
             return is_good;
