@@ -36,6 +36,10 @@ void rec_lambda_qa(){
 			.Define("good_candidate",
 					"std::vector<int> good_candidate;\n"
 					"for(int i=0; i<daughter_cosines.at(0).size(); ++i){\n"
+          " if( m_err.at(i) > 0.001050 ){\n"
+          "  good_candidate.push_back(0);\n"
+          "  continue;\n"
+          " }\n"
           " if( daughter2_cos.at(i) < 0.9983 ){\n"
           "  good_candidate.push_back(0);\n"
           "  continue;\n"
@@ -49,7 +53,8 @@ void rec_lambda_qa(){
           "   continue;\n"
           " }\n"
           " good_candidate.push_back( 1 );\n"
-					"} return good_candidate;\n"
+					"}\n"
+          "return good_candidate;\n"
 			)
 			.Define("selected_signal",
 			"std::vector<int> selected_signal;"
