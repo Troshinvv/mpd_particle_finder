@@ -13,6 +13,18 @@
 #include <OutputContainer.hpp>
 #include <ROOT/RVec.hxx>
 
+struct DaughterConfig{
+  int pdg;
+  float chi2_prim;
+  float cos;
+};
+
+struct MotherConfig{
+  int pdg;
+  float L;
+  float LdL;
+};
+
 class Finder {
 public:
   Finder() = default;
@@ -33,6 +45,21 @@ public:
     mother.CancelCutDistance();
     mother.CancelCutLdL();
     mother.CancelCutDistanceToSV();
+    decays_.emplace_back( name, mother, daughters );
+  };
+  void AddDecay( const std::string& name, MotherConfig mother_config, const std::vector<DaughterConfig>& daughter_configs ) {
+    std::vector<Daughter> daughters;
+    for( const auto& conf : daughter_configs ){
+      daughters.emplace_back( conf.pdg );
+      daughters.back().SetCutChi2Prim( conf.chi2_prim );
+      daughters.back().SetCutCos( conf.cos );
+    }
+    Mother mother(mother_config.pdg);
+    mother.CancelCutChi2Geo();
+    mother.CancelCutDistance();
+    mother.CancelCutDistanceToSV();
+    mother.SetCutLdL( mother_config.LdL );
+    mother.SetCutDecayLength( mother_config.L );
     decays_.emplace_back( name, mother, daughters );
   };
   ROOT::RVec<OutputContainer> operator()(const std::vector<float>& primary_vertex,
