@@ -141,8 +141,8 @@ void rec_lambda_qa(){
       hist1d.push_back( dd.Histo1D( { std::data("h1_daughters_prat_"+cut), ";p_{d1}/p_{d2}; counts", 200, 0.0, 1.0 }, "daughters_prat", cut ) );
       hist1d.push_back( dd.Histo1D( { std::data("h1_daughter1_prat_"+cut), ";p_{d1}/p_{c}; counts", 200, 0.0, 1.0 }, "daughter1_prat", cut ) );
       hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_prat"+cut), ";p_{d2}/p_{c}; counts", 200, 0.0, 1.0 }, "daughter2_prat", cut ) );
-      hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_geo_"+cut), ";#chi^{2}_{geo}; counts", 150, 0.0, 5.0 }, "candidate_chi2_geo", cut ) );
-			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_topo_"+cut), ";#chi^{2}_{topo}; counts", 150, 0.0, 150.0 }, "candidate_chi2_topo", cut ) );
+      hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_geo_"+cut), ";#chi^{2}_{geo}; counts", 150, 0.0, 30.0 }, "candidate_chi2_geo", cut ) );
+			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_topo_"+cut), ";#chi^{2}_{topo}; counts", 150, 0.0, 500.0 }, "candidate_chi2_topo", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_cos_topo_"+cut), ";r_{#lambda}p_{#lambda}; counts", 100, 0.99, 1.0 }, "candidate_cos_topo", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter_dca_"+cut), ";DCA; counts", 100, 0.0, 5.0 }, "daughter_dca", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter_distance_to_sv_"+cut), ";DCA_{prim}; counts", 100, 0.0, 10.0 }, "distance_to_sv", cut ) );
