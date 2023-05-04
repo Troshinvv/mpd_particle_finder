@@ -61,9 +61,11 @@ void lambda(std::string list){
             ;
 
   Finder finder;
-  finder.AddDecay("lambda", { 3122, 2.25, 6.25 }, { {-211, 535, -1 }, {2212, 100, 0.9} });
-//  finder.AddDecay("lambda", 3122, {-211, 2212});
-  auto ddd = dd
+//  finder.AddDecay("lambda", MotherConfig().SetPdg(3122),
+//                  { DaughterConfig().SetPdg(-211),
+//                    DaughterConfig().SetPdg(2212) });
+  finder.AddDecay("lambda", 3122, {-211, 2212});
+  auto ddd = dd.Filter("10 < centrality && centrality < 40")
           .Define( "candidates", finder, {"primary_vtx",
                                            "stsTrackParameters",
                                            "stsTrackCovMatrix",
