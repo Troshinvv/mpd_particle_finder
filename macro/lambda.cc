@@ -61,7 +61,7 @@ void lambda(std::string list){
             ;
 
   Finder finder;
-  finder.AddDecay("lambda", MotherConfig().SetPdg(3122).SetL(2.25).SetLdL(6.25),
+  finder.AddDecay("lambda", MotherConfig().SetPdg(3122).SetL(2.25).SetLdL(6.25).SetChi2Geo(40).SetDca(0.728),
                   { DaughterConfig().SetPdg(-211).SetChi2Prim(535),
                     DaughterConfig().SetPdg(2212).SetChi2Prim(50).SetCos(0.99) });
 //  finder.AddDecay("lambda", 3122, {-211, 2212});
