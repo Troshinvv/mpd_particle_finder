@@ -31,7 +31,7 @@ class MotherConfig{
 public:
   friend class Finder;
   MotherConfig() : pdg_(2212), L_(-huge_value), LdL_(-huge_value), cos_topo_(-huge_value),
-  chi2_geo_(huge_value), chi2_topo_(-huge_value), dca_(huge_value) {}
+  chi2_geo_(huge_value), chi2_topo_(huge_value), dca_(huge_value) {}
   MotherConfig& SetPdg(int pdg) { pdg_ = pdg; return *this; }
   MotherConfig& SetL(float l) { L_ = l; return *this; }
   MotherConfig& SetLdL(float ld_l) { LdL_ = ld_l; return *this; }
@@ -78,9 +78,6 @@ public:
     Mother mother(mother_config.pdg_);
     mother.CancelCuts();
     mother.SetCutLdL( mother_config.LdL_ );
-    std::cout << "***************************" << std::endl;
-    std::cout << "mother_config.LdL_ = " << mother_config.LdL_ << std::endl;
-    std::cout << "***************************" << std::endl;
     mother.SetCutDecayLength( mother_config.L_ );
     mother.SetCutCosTopo( mother_config.cos_topo_ );
     mother.SetCutChi2Geo( mother_config.chi2_geo_ );
