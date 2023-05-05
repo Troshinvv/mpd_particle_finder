@@ -48,7 +48,7 @@ void field_lambda(std::string list){
               for( int i=0; i<pdg_vector.size(); ++i ) {
               auto pid = pdg_vector.at(i);
               auto z = parameters.at(i).at(2);
-              if( z < 40.0 ){
+              if( z > 40.0 ){
                 is_good.push_back(0);
                 continue;
               }
