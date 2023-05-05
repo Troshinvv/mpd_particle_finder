@@ -43,9 +43,19 @@ void lambda(std::string list){
             }
             return pdg;
             }, { "trSimIndex", "simPdg" })
-            .Define("is_good_track", [](std::vector<int> pdg_vector){
+            .Define("is_good_track", [](std::vector<int> pdg_vector, std::vector<float> chi2_ndf){
             std::vector<int> is_good;
-            for( auto pid : pdg_vector ) {
+            for( int i=0; i<pdg_vector.size(); ++i ) {
+              auto pid = pdg_vector.at(i);
+              auto chi2 = chi2_ndf.at(i);
+              if( chi2 < 0.5 ){
+                is_good.push_back(0);
+                continue;
+              }
+              if( chi2 > 15.0 ){
+                is_good.push_back(0);
+                continue;
+              }
               if(pid == 2212) {
                 is_good.push_back(1);
                 continue;
@@ -57,7 +67,7 @@ void lambda(std::string list){
               is_good.push_back(0);
             }
             return is_good;
-            }, { "pdg_vector" })
+            }, { "pdg_vector", "stsTrackChi2Ndf" })
             ;
 
   Finder finder;
