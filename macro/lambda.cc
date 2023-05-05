@@ -52,10 +52,6 @@ void lambda(std::string list){
                 is_good.push_back(0);
                 continue;
               }
-              if( chi2 > 15.0 ){
-                is_good.push_back(0);
-                continue;
-              }
               if(pid == 2212) {
                 is_good.push_back(1);
                 continue;

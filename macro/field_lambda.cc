@@ -43,9 +43,15 @@ void field_lambda(std::string list){
             }
             return pdg;
             }, { "trSimIndex", "simPdg" })
-            .Define("is_good_track", [](std::vector<int> pdg_vector){
+            .Define("is_good_track", [](std::vector<int> pdg_vector, std::vector<std::vector<float>> parameters){
             std::vector<int> is_good;
-            for( auto pid : pdg_vector ) {
+              for( int i=0; i<pdg_vector.size(); ++i ) {
+              auto pid = pdg_vector.at(i);
+              auto z = parameters.at(i).at(2);
+              if( z < 40.0 ){
+                is_good.push_back(0);
+                continue;
+              }
               if(pid == 2212) {
                 is_good.push_back(1);
                 continue;
@@ -57,7 +63,7 @@ void field_lambda(std::string list){
               is_good.push_back(0);
             }
             return is_good;
-            }, { "pdg_vector" })
+            }, { "pdg_vector", "stsTrackParameters" })
             .Define("zero_mag_field", [](std::vector<int> pdg_vector){
             std::vector<std::vector<float>> mag_field;
             for( auto pid : pdg_vector ) {
@@ -76,7 +82,7 @@ void field_lambda(std::string list){
           .Define( "candidates", finder, {"primary_vtx",
                                            "stsTrackParameters",
                                            "stsTrackCovMatrix",
-                                           "zero_mag_field",
+                                           "stsTrackMagField",
                                            "pdg_vector",
                                            "is_good_track"} )
           .Define("candidate_momenta", Getters::GetMomenta, {"candidates"} )
