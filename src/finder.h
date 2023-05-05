@@ -10,13 +10,14 @@
 #include <vector>
 #include <InputContainer.hpp>
 #include <Decay.hpp>
+#include <Constants.hpp>
 #include <OutputContainer.hpp>
 #include <ROOT/RVec.hxx>
 
 class DaughterConfig{
 public:
   friend class Finder;
-  DaughterConfig() : pdg_(2212), chi2_prim_(-1.0), cos_(-1.0) {}
+  DaughterConfig() : pdg_(2212), chi2_prim_(-huge_value), cos_(-huge_value) {}
   DaughterConfig& SetPdg(int pdg) { pdg_ = pdg; return *this; }
   DaughterConfig& SetChi2Prim(float chi_2_prim) { chi2_prim_ = chi_2_prim; return *this; }
   DaughterConfig& SetCos(float cos) { cos_ = cos; return *this; }
@@ -29,8 +30,8 @@ private:
 class MotherConfig{
 public:
   friend class Finder;
-  MotherConfig() : pdg_(2212), L_(-1.0), LdL_(-1.0), cos_topo_(-1.0),
-  chi2_geo_(999), chi2_topo_(-1), dca_(999) {}
+  MotherConfig() : pdg_(2212), L_(-huge_value), LdL_(-huge_value), cos_topo_(-huge_value),
+  chi2_geo_(huge_value), chi2_topo_(-huge_value), dca_(huge_value) {}
   MotherConfig& SetPdg(int pdg) { pdg_ = pdg; return *this; }
   MotherConfig& SetL(float l) { L_ = l; return *this; }
   MotherConfig& SetLdL(float ld_l) { LdL_ = ld_l; return *this; }
@@ -70,12 +71,16 @@ public:
     std::vector<Daughter> daughters;
     for( const auto& conf : daughter_configs ){
       daughters.emplace_back( conf.pdg_ );
+      daughters.back().CancelCuts();
       daughters.back().SetCutChi2Prim( conf.chi2_prim_ );
       daughters.back().SetCutCos( conf.cos_ );
     }
     Mother mother(mother_config.pdg_);
     mother.CancelCuts();
     mother.SetCutLdL( mother_config.LdL_ );
+    std::cout << "***************************" << std::endl;
+    std::cout << "mother_config.LdL_ = " << mother_config.LdL_ << std::endl;
+    std::cout << "***************************" << std::endl;
     mother.SetCutDecayLength( mother_config.L_ );
     mother.SetCutCosTopo( mother_config.cos_topo_ );
     mother.SetCutChi2Geo( mother_config.chi2_geo_ );
