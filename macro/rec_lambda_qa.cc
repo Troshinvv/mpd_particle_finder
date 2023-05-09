@@ -1,8 +1,11 @@
 void rec_lambda_qa(){
 	ROOT::RDataFrame d("t", "candidates.root");
 	auto dd = d
-			.Filter("10.0 < centrality && centrality < 40.0")
-			.Define("candidate_p", "std::vector<float> p; for( auto mom : candidate_momenta ){ p.push_back( mom.P() ); } return p;")
+			.Filter(  "10.0 < centrality && centrality < 40.0")
+      .Define( "tru_pT", "std::vector<float> pT; for( auto mom : simMom ){ pT.push_back( mom.Pt() ); } return pT;")
+      .Define( "tru_y", "std::vector<float> y; for( auto mom : simMom ){ y.push_back( mom.Rapidity() ); } return y;")
+      .Define( "is_lambda", "simPdg == 3122")
+      .Define("candidate_p", "std::vector<float> p; for( auto mom : candidate_momenta ){ p.push_back( mom.P() ); } return p;")
 			.Define("candidate_pT", "std::vector<float> pT; for( auto mom : candidate_momenta ){ pT.push_back( mom.Pt() ); } return pT;")
 			.Define("candidate_phi", "std::vector<float> phi; for( auto mom : candidate_momenta ){ phi.push_back( mom.Phi() ); } return phi;")
 			.Define("candidate_rapidity", "std::vector<float> rapidity; for( auto mom : candidate_momenta ){ rapidity.push_back( mom.Rapidity() ); } return rapidity;")
@@ -107,9 +110,11 @@ void rec_lambda_qa(){
 	hist1d.push_back( dd.Histo1D( { "h1_daughter_distance_to_sv", ";DCA_{prim}; counts", 100, 0.0, 10.0 }, "distance_to_sv" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_L", ";L; counts", 100, 0.0, 20.0 }, "candidate_L" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_LdL", ";L/dL; counts", 100, 0.0, 20.0 }, "candidate_LdL" ) );
-	hist2d.push_back( dd.Histo2D( { "h2_pT_y", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5  }, "candidate_rapidity", "candidate_pT" ) );
-	
-	for( auto cut : cuts ){
+
+  hist2d.push_back( dd.Histo2D( { "h2_pT_y", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5  }, "candidate_rapidity", "candidate_pT" ) );
+  hist2d.push_back( dd.Histo2D( { "h2_tru_pT_tru_y", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5 }, "tru_y", "tru_pT", "is_lambda" ) );
+
+  for( auto cut : cuts ){
 		hist1d.push_back( dd.Histo1D( { std::data("h1_mass_"+cut), ";m (GeV/c^2); counts", 100, 1.05, 1.25 }, "candidate_mass", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_pT_"+cut), ";p_{T} (GeV/c); counts", 100, 0.00, 2.0 }, "candidate_pT", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_phi_"+cut), ";#varphi (rad); counts", 100, -3.50, 3.5 }, "candidate_phi", cut ) );

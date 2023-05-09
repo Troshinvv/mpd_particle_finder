@@ -51,12 +51,11 @@ Finder::operator()(const std::vector<float>& primary_vertex,
 }
 
 ROOT::RVec<OutputContainer> Finder::Find() try {
-
-  std::unique_ptr<SimpleFinder> finder = std::make_unique<SimpleFinder>();
-  finder->SetDecays(decays_);
-  finder->Init(input_container_);
-  finder->FindParticles();
-  auto candidates = ROOT::RVec(finder->GetCandidates());
+  SimpleFinder finder;
+  finder.SetDecays(decays_);
+  finder.Init(input_container_);
+  finder.FindParticles();
+  auto candidates = ROOT::RVec( finder.GetCandidates() );
   return candidates;
 } catch ( std::exception &e ){
   std::cout << __func__ << "(): Exception is issued" << "\n";
