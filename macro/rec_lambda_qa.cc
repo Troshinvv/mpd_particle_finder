@@ -147,8 +147,6 @@ void rec_lambda_qa(){
       hist2d.push_back( dd.Histo2D( { std::data(name+"_background"), title.c_str(), nb1, lo1, hi1, nb2, lo2, hi2 }, field1, field2, "background" ) );
     }
   }
-  hist2d.push_back( dd.Histo2D( { "h2_L_LdL", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5 }, "h1_candidate_L", "h1_candidate_L" ) );
-  hist2d.push_back( dd.Histo2D( { "h2_L_LdL", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5 }, "h1_candidate_L", "h1_candidate_L" ) );
 
   for( auto cut : cuts ){
 		hist1d.push_back( dd.Histo1D( { std::data("h1_mass_"+cut), ";m (GeV/c^2); counts", 100, 1.05, 1.25 }, "candidate_mass", cut ) );
