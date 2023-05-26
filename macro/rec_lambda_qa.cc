@@ -114,6 +114,42 @@ void rec_lambda_qa(){
   hist2d.push_back( dd.Histo2D( { "h2_pT_y", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5  }, "candidate_rapidity", "candidate_pT" ) );
   hist2d.push_back( dd.Histo2D( { "h2_tru_pT_tru_y", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5 }, "tru_y", "tru_pT", "is_lambda" ) );
 
+  std::vector<std::string> selection_fields{
+    "candidate_L",
+    "candidate_LdL",
+    "candidate_chi2_geo",
+    "daughter_dca",
+    "candidate_cos_topo",
+    "daughter1_cos",
+    "daughter1_chi2_prim",
+    "daughter2_chi2_prim",
+    };
+  std::vector<std::tuple<int, double, double>> axis_ranges{
+          {100, 0.0, 50.0},
+          {100, 0.0, 50.0},
+          {100, 0.0, 100.0},
+          {100, 0.0, 5.0},
+          {100, 0.99, 1.0},
+          {100, 0.99, 1.0},
+          {100, 0.99, 2000.0},
+          {100, 0.99, 2000.0},
+  };
+  for( int i=0; i<selection_fields.size(); ++i ){
+    for( int j=i+1; j<selection_fields.size(); ++j ){
+      auto field1 = selection_fields.at(i);
+      auto [nb1, lo1, hi1] = axis_ranges.at(i);
+      auto field2 = selection_fields.at(j);
+      auto [nb2, lo2, hi2] = axis_ranges.at(j);
+      std::string name = "h2_"+field1+"_"+field2;
+      std::string title = ";"+field1+";"+field2;
+      hist2d.push_back( dd.Histo2D( { name.c_str(), title.c_str(), nb1, lo1, hi1, nb2, lo2, hi2 }, field1, field2 ) );
+      hist2d.push_back( dd.Histo2D( { std::data(name+"_signal"), title.c_str(), nb1, lo1, hi1, nb2, lo2, hi2 }, field1, field2, "signal" ) );
+      hist2d.push_back( dd.Histo2D( { std::data(name+"_background"), title.c_str(), nb1, lo1, hi1, nb2, lo2, hi2 }, field1, field2, "background" ) );
+    }
+  }
+  hist2d.push_back( dd.Histo2D( { "h2_L_LdL", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5 }, "h1_candidate_L", "h1_candidate_L" ) );
+  hist2d.push_back( dd.Histo2D( { "h2_L_LdL", ";y;p_{T} (GeV/c)", 30, 0.0, 3.0, 25, 0.0, 2.5 }, "h1_candidate_L", "h1_candidate_L" ) );
+
   for( auto cut : cuts ){
 		hist1d.push_back( dd.Histo1D( { std::data("h1_mass_"+cut), ";m (GeV/c^2); counts", 100, 1.05, 1.25 }, "candidate_mass", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_pT_"+cut), ";p_{T} (GeV/c); counts", 100, 0.00, 2.0 }, "candidate_pT", cut ) );
