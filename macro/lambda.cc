@@ -4,19 +4,23 @@
 
 
 void lambda(std::string list){
+
+  TStopwatch timer;
+  timer.Start();
+  
   TFileCollection collection( "collection", "", list.c_str() );
   auto* chain = new TChain( "t" );
   chain->AddFileInfoList( collection.GetList() );
   ROOT::RDataFrame d( *chain );
 
   auto dd = d
-          .Define("primary_vtx", [](double x, double y, double z){
+          .Define("primary_vtx", [](float x, float y, float z){
             return std::vector<float>{ static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
-            }, { "vtxX", "vtxY", "vtxZ"})
+            }, { "recoPrimVtxX", "recoPrimVtxY", "recoPrimVtxZ"})
           .Define("centrality", [](ROOT::VecOps::RVec<float> mom){
             float centrality{-1.f};
-            std::vector<float> centrality_percentage{ 0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100 };
-            std::vector<int> multiplicity_edges{ 249, 118, 102, 89, 77, 67, 57, 49, 42, 29, 20, 13, 8, 4, 0 };
+            std::vector<float> centrality_percentage{ 10, 100 };
+            std::vector<int> multiplicity_edges{ 1000, 0 };
             auto multiplicity = mom.size();
             int idx = 0;
             float bin_edge = multiplicity_edges[idx];
@@ -27,7 +31,7 @@ void lambda(std::string list){
             }
             centrality = (centrality_percentage[idx-1] + centrality_percentage[idx])/2.0f;
             return centrality;
-            }, { "trP" })
+            }, { "recoGlobalP" })
           .Define("pdg_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg){
             std::vector<int> pdg;
             for( auto idx : sim_index ) {
@@ -42,13 +46,35 @@ void lambda(std::string list){
               pdg.push_back(sim_pdg.at(idx));
             }
             return pdg;
-            }, { "trSimIndex", "simPdg" })
-            .Define("is_good_track", [](std::vector<int> pdg_vector, std::vector<float> chi2_ndf){
+            }, { "recoGlobalSimIndex", "simPdg" })
+            .Define("mId_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> motherIds) {
+             std::vector<int> mId;
+             for ( auto idx : sim_index ) {
+               if (idx < 0) {
+                 mId.push_back(-999);
+                 continue;
+               }
+               if (idx >= motherIds.size()) {
+                 mId.push_back(-999);
+                 continue;
+               }
+               mId.push_back(motherIds.at(idx));
+             }
+             return mId;
+            }, { "recoGlobalSimIndex", "simMotherId" })
+            .Define("is_good_track", [](std::vector<int> pdg_vector,
+                                        std::vector<int> mId_vector,
+                                        ROOT::VecOps::RVec<int> nhits){
             std::vector<int> is_good;
             for( int i=0; i<pdg_vector.size(); ++i ) {
               auto pid = pdg_vector.at(i);
-              auto chi2 = chi2_ndf.at(i);
-              if( chi2 < 0.5 ){
+              auto nhit = nhits.at(i);
+              auto motherId = mId_vector.at(i);
+              if( motherId == -1 ) {
+                is_good.push_back(0);
+                continue;
+              }
+              if( nhit < 10 ){
                 is_good.push_back(0);
                 continue;
               }
@@ -63,7 +89,7 @@ void lambda(std::string list){
               is_good.push_back(0);
             }
             return is_good;
-            }, { "pdg_vector", "stsTrackChi2Ndf" })
+            }, { "pdg_vector", "mId_vector", "recoGlobalNhits" })
             ;
 
   Finder finder;
@@ -77,11 +103,11 @@ void lambda(std::string list){
     DaughterConfig().SetPdg(2212),
     });
 //  finder.AddDecay("lambda", 3122, {-211, 2212});
-  auto ddd = dd.Filter("10 < centrality && centrality < 40")
+  auto ddd = dd.Filter("0 < centrality && centrality < 100")
           .Define( "candidates", finder, {"primary_vtx",
-                                           "stsTrackParameters",
-                                           "stsTrackCovMatrix",
-                                           "stsTrackMagField",
+                                           "recoKalmanParamVertex",
+                                           "recoKalmanCovMtxVertex",
+                                           "recoKalmanMagField",
                                            "pdg_vector",
                                            "is_good_track"} )
           .Define("candidate_momenta", Getters::GetMomenta, {"candidates"} )
@@ -101,7 +127,7 @@ void lambda(std::string list){
           .Define("candidate_true_pid", Getters::GetTruePDG, {
                   "candidates",
                   "simMotherId",
-                  "trSimIndex",
+                  "recoGlobalSimIndex",
                   "simPdg"
           } )
           ;
@@ -120,4 +146,6 @@ void lambda(std::string list){
     std::cout << field << "\n";
   ddd.Snapshot("t", "candidates.root", white_list );
 
+  timer.Stop();
+  timer.Print();
 }

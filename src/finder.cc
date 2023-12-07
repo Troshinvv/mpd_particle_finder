@@ -29,20 +29,13 @@ Finder::operator()(const std::vector<float>& primary_vertex,
     const auto x = trk_parameters.at(0);
     const auto y = trk_parameters.at(1);
     const auto z = trk_parameters.at(2);
-    const auto tx = trk_parameters.at(3);
-    const auto ty = trk_parameters.at(4);
-    const auto qp = trk_parameters.at(5);
+    const auto px = trk_parameters.at(3);
+    const auto py = trk_parameters.at(4);
+    const auto pz = trk_parameters.at(5);
+    const auto q = trk_parameters.at(6);
 
-    const auto p = fabsf( 1.0f / qp );
-    const auto q = qp * p;
-    const auto pz = sqrtf( p*p / ( tx*tx + ty*ty + 1 ) );
-    const auto px = tx*pz;
-    const auto py = ty*pz;
-
-    const auto J = Utils::CalculateJacobian(trk_parameters);
-    const auto new_cov = Utils::CalculateCovariance( trk_cov, J );
     const std::vector<float> par{ x, y, z, px, py, pz };
-    input_container_.AddTrack( par, new_cov, trk_field, static_cast<int>(q), trk_pid, i );
+    input_container_.AddTrack( par, trk_cov, trk_field, static_cast<int>(q), trk_pid, i );
   }
   return Find();
 } catch ( std::exception &e ){
