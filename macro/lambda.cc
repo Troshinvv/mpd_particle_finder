@@ -1,7 +1,10 @@
 //
 // Created by Misha on 3/15/2023.
 //
-
+using namespace ROOT;
+using namespace ROOT::Math;
+using namespace ROOT::RDF;
+using fourVector=LorentzVector<PtEtaPhiE4D<double>>;
 
 void lambda(std::string list){
 
@@ -17,7 +20,7 @@ void lambda(std::string list){
           .Define("primary_vtx", [](float x, float y, float z){
             return std::vector<float>{ static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
             }, { "recoPrimVtxX", "recoPrimVtxY", "recoPrimVtxZ"})
-          .Define("centrality", [](ROOT::VecOps::RVec<float> mom){
+          .Define("centrality", [](ROOT::VecOps::RVec<fourVector> mom){
             float centrality{-1.f};
             std::vector<float> centrality_percentage{ 10, 100 };
             std::vector<int> multiplicity_edges{ 1000, 0 };
@@ -31,7 +34,7 @@ void lambda(std::string list){
             }
             centrality = (centrality_percentage[idx-1] + centrality_percentage[idx])/2.0f;
             return centrality;
-            }, { "recoGlobalP" })
+            }, { "recoGlobalMom" })
           .Define("pdg_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg){
             std::vector<int> pdg;
             for( auto idx : sim_index ) {
