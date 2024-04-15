@@ -96,10 +96,10 @@ void lambda_kshort(std::string list){
               auto nhit = nhits.at(i);
               auto motherId = mId_vector.at(i);
               auto dca = dca_vector.at(i).R();
-              //if( motherId == -1 ) {
-              //  is_good.push_back(0);
-              //  continue;
-              //}
+              if( motherId == -1 ) {
+                is_good.push_back(0);
+                continue;
+              }
               // if (dca < 20.){
               //   is_good.push_back(0);
               //   continue;
@@ -130,10 +130,10 @@ void lambda_kshort(std::string list){
               auto nhit = nhits.at(i);
               auto motherId = mId_vector.at(i);
               auto dca = dca_vector.at(i).R();
-              //if( motherId == -1 ) {
-              //  is_good.push_back(0);
-              //  continue;
-              //}
+              if( motherId == -1 ) {
+                is_good.push_back(0);
+                continue;
+              }
               // if (dca < 20.){
               //   is_good.push_back(0);
               //   continue;
@@ -279,8 +279,11 @@ void lambda_kshort(std::string list){
                   "simPdg"
           } )
           ;
+
+  //ddd.Foreach([](ULong64_t evtId){if (evtId % 100 == 0) cout << "\t" << evtId << "\n";}, {"rdfentry_"});
+  
   auto fields = ddd.GetColumnNames();
-  std::vector<std::string> exclude_fields{"centrality", "lambda_candidates", "kshort_candidates", "lambda_bg_candidates", "kshort_bg_candidates", "recoKalmanParamVertexBgPion", "primary_vtx", "primary_vtx", "is_good_track_lambda", "is_good_track_kshort"};
+  std::vector<std::string> exclude_fields{"centrality", "mId_vector", "pdg_vector", "lambda_candidates", "kshort_candidates", "lambda_bg_candidates", "kshort_bg_candidates", "recoKalmanParamVertexBgPion", "primary_vtx", "primary_vtx", "is_good_track_lambda", "is_good_track_kshort"};
   std::vector<std::string> white_list{};
   for(const auto& field : fields){
     if( std::find(exclude_fields.begin(), exclude_fields.end(), field) != exclude_fields.end() )
