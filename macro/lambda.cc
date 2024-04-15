@@ -35,9 +35,12 @@ void lambda(std::string list){
             centrality = (centrality_percentage[idx-1] + centrality_percentage[idx])/2.0f;
             return centrality;
             }, { "recoGlobalMom" })
-          .Define("pdg_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg){
+          .Define("pdg_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg, ROOT::VecOps::RVec<short> charge){
             std::vector<int> pdg;
-            for( auto idx : sim_index ) {
+            for (int i=0; i<sim_index.size(); ++i) {
+            //for( auto idx : sim_index ) {
+              auto idx = sim_index.at(i);
+              auto q = charge.at(i);
               if( idx < 0 ) {
                 pdg.push_back(-999);
                 continue;
@@ -46,13 +49,18 @@ void lambda(std::string list){
                 pdg.push_back(-999);
                 continue;
               }
+              //if ( q < 0 )
+              //  pdg.push_back(-211);
+              //else
               pdg.push_back(sim_pdg.at(idx));
             }
             return pdg;
-            }, { "recoGlobalSimIndex", "simPdg" })
+            }, { "recoGlobalSimIndex", "simPdg", "recoGlobalCharge" })
             .Define("mId_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> motherIds) {
              std::vector<int> mId;
-             for ( auto idx : sim_index ) {
+             //for ( auto idx : sim_index ) {
+             for (int i=0; i<sim_index.size(); ++i) {
+               auto idx = sim_index.at(i);
                if (idx < 0) {
                  mId.push_back(-999);
                  continue;
@@ -67,16 +75,22 @@ void lambda(std::string list){
             }, { "recoGlobalSimIndex", "simMotherId" })
             .Define("is_good_track", [](std::vector<int> pdg_vector,
                                         std::vector<int> mId_vector,
-                                        ROOT::VecOps::RVec<int> nhits){
+                                        ROOT::VecOps::RVec<int> nhits,
+                                        ROOT::VecOps::RVec<ROOT::Math::XYZVector> dca_vector){
             std::vector<int> is_good;
             for( int i=0; i<pdg_vector.size(); ++i ) {
               auto pid = pdg_vector.at(i);
               auto nhit = nhits.at(i);
               auto motherId = mId_vector.at(i);
-              if( motherId == -1 ) {
-                is_good.push_back(0);
-                continue;
-              }
+              auto dca = dca_vector.at(i).R();
+              // if( motherId == -1 ) {
+              //   is_good.push_back(0);
+              //   continue;
+              // }
+              // if (dca < 20.){
+              //   is_good.push_back(0);
+              //   continue;
+              // }
               if( nhit < 10 ){
                 is_good.push_back(0);
                 continue;
@@ -92,7 +106,7 @@ void lambda(std::string list){
               is_good.push_back(0);
             }
             return is_good;
-            }, { "pdg_vector", "mId_vector", "recoGlobalNhits" })
+            }, { "pdg_vector", "mId_vector", "recoGlobalNhits", "recoGlobalDca" })
             ;
 
   Finder finder;
