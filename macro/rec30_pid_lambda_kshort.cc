@@ -6,7 +6,7 @@ using namespace ROOT::Math;
 using namespace ROOT::RDF;
 using fourVector=LorentzVector<PtEtaPhiE4D<double>>;
 
-void lambda_kshort(std::string list){
+void rec30_pid_lambda_kshort(std::string list){
 
   TStopwatch timer;
   timer.Start();
@@ -20,14 +20,13 @@ void lambda_kshort(std::string list){
           .Define("primary_vtx", [](float x, float y, float z){
             return std::vector<float>{ static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
             }, { "recoPrimVtxX", "recoPrimVtxY", "recoPrimVtxZ"})
-          .Filter("recoPrimVtxZ<130 && recoPrimVtxZ>-130")
           .Define("centrality", [](ROOT::VecOps::RVec<fourVector> mom, ROOT::VecOps::RVec<int> nhits, ROOT::VecOps::RVec<ROOT::Math::XYZVector> dca){
             float centrality{-1.f};
             std::vector<float> centrality_percentage{ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-            std::vector<int> multiplicity_edges{ 309, 171, 120, 83, 56, 37, 23, 13, 7, 3, 1 };
+            std::vector<int> multiplicity_edges{ 271, 183, 126, 84, 55, 34, 21, 12, 6, 1, 0 };
             int multiplicity = 0;
             for(int i=0; i< mom.size();i++){
-             if(dca.at(i).R()>1 || nhits.at(i)<16 || mom.at(i).Pt()<0.15 || mom.at(i).Eta()>0.5)
+             if(dca.at(i).R()>2 || nhits.at(i)<10 || mom.at(i).Pt()<0.1 || mom.at(i).Eta()>0.5)
                  continue;
              else
                multiplicity++;
@@ -42,19 +41,23 @@ void lambda_kshort(std::string list){
             centrality = (centrality_percentage[idx-1] + centrality_percentage[idx])/2.0f;
             return centrality;
             }, { "recoGlobalMom","recoGlobalNhits","recoGlobalDca" })
-          .Define("pdg_vector", []( ROOT::VecOps::RVec<short> charge){
+            .Define("pdg_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg, ROOT::VecOps::RVec<short> charge){
             std::vector<int> pdg;
-            for (int i=0; i<charge.size(); ++i) {
+            for (int i=0; i<sim_index.size(); ++i) {
+              auto idx = sim_index.at(i);
               auto q = charge.at(i);
-              if( q > 0 ) {
-                pdg.push_back(2212);
+              if( idx < 0 ) {
+                pdg.push_back(-999);
                 continue;
               }
-              if ( q < 0 )
-                pdg.push_back(-211);
+              if( idx >= sim_pdg.size() ) {
+                pdg.push_back(-999);
+                continue;
+              }
+              pdg.push_back(sim_pdg.at(idx));
             }
             return pdg;
-            }, {  "recoGlobalCharge" })
+            }, { "recoGlobalSimIndex", "simPdg", "recoGlobalCharge" })
             .Define("is_good_track_lambda", [](std::vector<int> pdg_vector,
                                                ROOT::VecOps::RVec<int> nhits){
             std::vector<int> is_good;

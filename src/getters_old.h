@@ -147,11 +147,11 @@ inline auto GetTruePDG( const ROOT::RVec<OutputContainer>& candidates,
     const auto daughter2 = daughters_id.at(1);
 
     if( daughter1 >= sim_ids.size() ){
-      true_pdg.push_back(-999);
+      true_pdg.push_back(-1);
       continue;
     }
     if( daughter2 >= sim_ids.size() ){
-      true_pdg.push_back(-998);
+      true_pdg.push_back(-1);
       continue;
     }
 
@@ -159,11 +159,11 @@ inline auto GetTruePDG( const ROOT::RVec<OutputContainer>& candidates,
     const auto match2 = sim_ids.at(daughter2);
 
     if(match1 < 0){
-      true_pdg.push_back(-997);
+      true_pdg.push_back(-1);
       continue;
     }
     if(match2 < 0){
-      true_pdg.push_back(-996);
+      true_pdg.push_back(-1);
       continue;
     }
 
@@ -171,15 +171,15 @@ inline auto GetTruePDG( const ROOT::RVec<OutputContainer>& candidates,
     const auto mother_id2 = mother_ids.at(match2);
 
     if( mother_id1 != mother_id2 ){
-      true_pdg.push_back(-995);
+      true_pdg.push_back(-1);
       continue;
     }
     if (mother_id1 == -1){
-      true_pdg.push_back(-994);
+      true_pdg.push_back(-1);
       continue;
     }
     if ( mother_id1 >= sim_pid.size() ){
-      true_pdg.push_back(-993);
+      true_pdg.push_back(-1);
       continue;
     }
     true_pdg.push_back(sim_pid.at(mother_id1));
@@ -190,185 +190,6 @@ inline auto GetTruePDG( const ROOT::RVec<OutputContainer>& candidates,
   throw e;
 }
 
-inline auto GetTruepT( const ROOT::RVec<OutputContainer>& candidates,
-                  ROOT::VecOps::RVec<int> mother_ids,
-                  ROOT::VecOps::RVec<int> sim_ids,
-                  std::vector<float> sim_pt) try {
-  std::vector<float> true_pdg;
-  for( const auto& cand : candidates ){
-    auto daughters_id = cand.GetDaughterIds();
-
-    const auto daughter1 = daughters_id.at(0);
-    const auto daughter2 = daughters_id.at(1);
-
-    if( daughter1 >= sim_ids.size() ){
-      true_pdg.push_back(-999);
-      continue;
-    }
-    if( daughter2 >= sim_ids.size() ){
-      true_pdg.push_back(-998);
-      continue;
-    }
-
-    const auto match1 = sim_ids.at(daughter1);
-    const auto match2 = sim_ids.at(daughter2);
-
-    if(match1 < 0){
-      true_pdg.push_back(-997);
-      continue;
-    }
-    if(match2 < 0){
-      true_pdg.push_back(-996);
-      continue;
-    }
-
-    const auto mother_id1 = mother_ids.at(match1);
-    const auto mother_id2 = mother_ids.at(match2);
-
-    if( mother_id1 != mother_id2 ){
-      true_pdg.push_back(-995);
-      continue;
-    }
-    if (mother_id1 == -1){
-      true_pdg.push_back(-994);
-      continue;
-    }
-    if ( mother_id1 >= sim_pt.size() ){
-      true_pdg.push_back(-993);
-      continue;
-    }
-    true_pdg.push_back(sim_pt.at(mother_id1));
-  }
-  return true_pdg;
-} catch ( const std::out_of_range &e ){
-  std::cerr << __func__ << "(): Exception was issued" << "\n";
-  throw e;
-}
-inline auto GetTrueId( const ROOT::RVec<OutputContainer>& candidates,
-                  ROOT::VecOps::RVec<int> mother_ids,
-                  ROOT::VecOps::RVec<int> sim_ids,
-                  ROOT::VecOps::RVec<int> sim_pid) try {
-  std::vector<int> true_id;
-  for( const auto& cand : candidates ){
-    auto daughters_id = cand.GetDaughterIds();
-
-    const auto daughter1 = daughters_id.at(0);
-    const auto daughter2 = daughters_id.at(1);
-
-    if( daughter1 >= sim_ids.size() ){
-      true_id.push_back(-999);
-      continue;
-    }
-    if( daughter2 >= sim_ids.size() ){
-      true_id.push_back(-998);
-      continue;
-    }
-
-    const auto match1 = sim_ids.at(daughter1);
-    const auto match2 = sim_ids.at(daughter2);
-
-    if(match1 < 0){
-      true_id.push_back(-997);
-      continue;
-    }
-    if(match2 < 0){
-      true_id.push_back(-996);
-      continue;
-    }
-
-    const auto mother_id1 = mother_ids.at(match1);
-    const auto mother_id2 = mother_ids.at(match2);
-
-   if( mother_id1 != mother_id2 ){
-      true_id.push_back(-995);
-      continue;
-    }
-    if (mother_id1 == -1){
-      true_id.push_back(-994);
-      continue;
-    }
-    if ( mother_id1 >= sim_pid.size() ){
-      true_id.push_back(-993);
-      continue;
-    }
-    true_id.push_back(mother_ids.at(mother_id1));
-  }
-  return true_id;
-} catch ( const std::out_of_range &e ){
-  std::cerr << __func__ << "(): Exception was issued" << "\n";
-  throw e;
-}
-
-
-inline auto GetFlag( const ROOT::RVec<OutputContainer>& candidates,
-                  ROOT::VecOps::RVec<int> mother_ids,
-                  ROOT::VecOps::RVec<int> sim_ids,
-                  ROOT::VecOps::RVec<int> sim_pid) try {
-  std::vector<int> true_id;
-  for( const auto& cand : candidates ){
-    auto daughters_id = cand.GetDaughterIds();
-
-    const auto daughter1 = daughters_id.at(0);
-    const auto daughter2 = daughters_id.at(1);
-
-    if( daughter1 >= sim_ids.size() ){
-      true_id.push_back(-999);
-      continue;
-    }
-    if( daughter2 >= sim_ids.size() ){
-      true_id.push_back(-998);
-      continue;
-    }
-
-    const auto match1 = sim_ids.at(daughter1);
-    const auto match2 = sim_ids.at(daughter2);
-
-    if(match1 < 0){
-      true_id.push_back(-997);
-      continue;
-    }
-    if(match2 < 0){
-      true_id.push_back(-996);
-      continue;
-    }
-
-    const auto mother_id1 = mother_ids.at(match1);
-    const auto mother_id2 = mother_ids.at(match2);
-
-    
-   if( mother_id1==-1 && mother_id2!=-1 ){
-      
-      true_id.push_back(-2);
-      continue;
-    }
-    if (mother_id1 != -1 && mother_id2==-1){
-      true_id.push_back(-3);
-      continue;
-    }
-    if (mother_id1 == -1 && mother_id2==-1){
-      true_id.push_back(-4);
-      continue;
-    }
-    if (mother_id1 != -1 && mother_id2!=-1 && mother_id1!=mother_id2){
-      true_id.push_back(-5);
-      continue;
-    }
-   if (mother_id1 != -1 && mother_id2!=-1 && mother_id1==mother_id2){
-      true_id.push_back(-6);
-      continue;
-    }
-    
-if ( mother_id1 >= sim_pid.size() ){
-      true_id.push_back(-993);
-      continue;
-    }
-    true_id.push_back(mother_ids.at(mother_id1));
-  }
-  return true_id;
-} catch ( const std::out_of_range &e ){
-  std::cerr << __func__ << "(): Exception was issued" << "\n";
-  throw e;
-}
 inline auto GetDaughterId( const ROOT::RVec<OutputContainer>& candidates ){
   std::vector<std::vector<int>> indices{ 2, std::vector<int>{} };
 

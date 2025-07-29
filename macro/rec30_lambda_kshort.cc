@@ -6,7 +6,7 @@ using namespace ROOT::Math;
 using namespace ROOT::RDF;
 using fourVector=LorentzVector<PtEtaPhiE4D<double>>;
 
-void lambda_kshort(std::string list){
+void rec30_lambda_kshort(std::string list){
 
   TStopwatch timer;
   timer.Start();
@@ -24,10 +24,10 @@ void lambda_kshort(std::string list){
           .Define("centrality", [](ROOT::VecOps::RVec<fourVector> mom, ROOT::VecOps::RVec<int> nhits, ROOT::VecOps::RVec<ROOT::Math::XYZVector> dca){
             float centrality{-1.f};
             std::vector<float> centrality_percentage{ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
-            std::vector<int> multiplicity_edges{ 309, 171, 120, 83, 56, 37, 23, 13, 7, 3, 1 };
+            std::vector<int> multiplicity_edges{ 271, 183, 126, 84, 55, 34, 21, 12, 6, 1, 0 };
             int multiplicity = 0;
             for(int i=0; i< mom.size();i++){
-             if(dca.at(i).R()>1 || nhits.at(i)<16 || mom.at(i).Pt()<0.15 || mom.at(i).Eta()>0.5)
+             if(dca.at(i).R()>2 || nhits.at(i)<10 || mom.at(i).Pt()<0.1 || mom.at(i).Eta()>0.5)
                  continue;
              else
                multiplicity++;
@@ -86,7 +86,7 @@ void lambda_kshort(std::string list){
     DaughterConfig().SetPdg(-211),
     DaughterConfig().SetPdg(2212),
     });
-  auto ddd = dd.Filter("20 < centrality && centrality < 50")
+  auto ddd = dd.Filter("10 < centrality && centrality < 50")
           .Define( "candidates", finder, {"primary_vtx",
                                            "recoKalmanParamVertex",
                                            "recoKalmanCovMtxVertex",

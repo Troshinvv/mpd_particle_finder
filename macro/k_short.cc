@@ -1,23 +1,37 @@
 //
 // Created by Misha on 3/15/2023.
 //
-
+using namespace ROOT;
+using namespace ROOT::Math;
+using namespace ROOT::RDF;
+using fourVector=LorentzVector<PtEtaPhiE4D<double>>;
 
 void k_short(std::string list){
+
+  TStopwatch timer;
+  timer.Start();
+  
   TFileCollection collection( "collection", "", list.c_str() );
   auto* chain = new TChain( "t" );
   chain->AddFileInfoList( collection.GetList() );
   ROOT::RDataFrame d( *chain );
 
   auto dd = d
-          .Define("primary_vtx", [](double x, double y, double z){
+          .Define("primary_vtx", [](float x, float y, float z){
             return std::vector<float>{ static_cast<float>(x), static_cast<float>(y), static_cast<float>(z)};
-            }, { "vtxX", "vtxY", "vtxZ"})
-          .Define("centrality", [](ROOT::VecOps::RVec<float> mom){
+            }, { "recoPrimVtxX", "recoPrimVtxY", "recoPrimVtxZ"})
+          .Filter("recoPrimVtxZ<130 && recoPrimVtxZ>-130")
+          .Define("centrality", [](ROOT::VecOps::RVec<fourVector> mom, ROOT::VecOps::RVec<int> nhits, ROOT::VecOps::RVec<ROOT::Math::XYZVector> dca){
             float centrality{-1.f};
-            std::vector<float> centrality_percentage{ 0, 5, 10, 15, 20, 25, 30, 35, 40, 50, 60, 70, 80, 90, 100 };
-            std::vector<int> multiplicity_edges{ 249, 118, 102, 89, 77, 67, 57, 49, 42, 29, 20, 13, 8, 4, 0 };
-            auto multiplicity = mom.size();
+            std::vector<float> centrality_percentage{ 0, 10, 20, 30, 40, 50, 60, 70, 80, 90, 100 };
+            std::vector<int> multiplicity_edges{ 309, 171, 120, 83, 56, 37, 23, 13, 7, 3, 1 };
+            int multiplicity = 0;
+            for(int i=0; i< mom.size();i++){
+             if(dca.at(i).R()>1 || nhits.at(i)<16 || mom.at(i).Pt()<0.15 || mom.at(i).Eta()>0.5)
+                 continue;
+             else
+               multiplicity++;
+            }
             int idx = 0;
             float bin_edge = multiplicity_edges[idx];
             while( multiplicity < bin_edge &&
@@ -27,26 +41,31 @@ void k_short(std::string list){
             }
             centrality = (centrality_percentage[idx-1] + centrality_percentage[idx])/2.0f;
             return centrality;
-            }, { "trP" })
-          .Define("pdg_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg){
+            }, { "recoGlobalMom","recoGlobalNhits","recoGlobalDca" })
+          .Define("pdg_vector", []( ROOT::VecOps::RVec<short> charge){
             std::vector<int> pdg;
-            for( auto idx : sim_index ) {
-              if( idx < 0 ) {
-                pdg.push_back(-999);
+            for (int i=0; i<charge.size(); ++i) {
+              auto q = charge.at(i);
+              if( q > 0 ) {
+                pdg.push_back(211);
                 continue;
               }
-              if( idx >= sim_pdg.size() ) {
-                pdg.push_back(-999);
-                continue;
-              }
-              pdg.push_back(sim_pdg.at(idx));
+              if ( q < 0 )
+                pdg.push_back(-211);
             }
             return pdg;
-            }, { "trSimIndex", "simPdg" })
-            .Define("is_good_track", [](std::vector<int> pdg_vector){
+            }, {  "recoGlobalCharge" })
+            .Define("is_good_track_lambda", [](std::vector<int> pdg_vector,
+                                               ROOT::VecOps::RVec<int> nhits){
             std::vector<int> is_good;
-            for( auto pid : pdg_vector ) {
-              if( pid == 211 ) {
+            for( int i=0; i<pdg_vector.size(); ++i ) {
+              auto pid = pdg_vector.at(i);
+              auto nhit = nhits.at(i);
+              if( nhit < 10 ){
+                is_good.push_back(0);
+                continue;
+              }
+              if(pid == 211) {
                 is_good.push_back(1);
                 continue;
               }
@@ -57,18 +76,18 @@ void k_short(std::string list){
               is_good.push_back(0);
             }
             return is_good;
-            }, { "pdg_vector" })
+            }, { "pdg_vector", "recoGlobalNhits" })
             ;
 
   Finder finder;
-  finder.AddDecay("k_short", 310, {-211, 211});
-  auto ddd = dd
+    finder.AddDecay("k_short", 310, {-211, 211});
+  auto ddd = dd.Filter("10 < centrality && centrality < 50")
           .Define( "candidates", finder, {"primary_vtx",
-                                           "stsTrackParameters",
-                                           "stsTrackCovMatrix",
-                                           "stsTrackMagField",
+                                           "recoKalmanParamVertex",
+                                           "recoKalmanCovMtxVertex",
+                                           "recoKalmanMagField",
                                            "pdg_vector",
-                                           "is_good_track"} )
+                                           "is_good_track_lambda"} )
           .Define("candidate_momenta", Getters::GetMomenta, {"candidates"} )
           .Define("candidate_mass", Getters::GetMass, {"candidates"} )
           .Define("candidate_momentum_errors", Getters::GetMomentumErr, {"candidates"} )
@@ -82,15 +101,31 @@ void k_short(std::string list){
           .Define("candidate_LdL", Getters::GetLdL, {"candidates"} )
           .Define("candidate_chi2_geo", Getters::GetChi2Geo, {"candidates"} )
           .Define("candidate_chi2_topo", Getters::GetChi2Topo, {"candidates"} )
-          .Define( "candidate_true_pid", Getters::GetTruePDG, {
+          .Define("daughter_id", Getters::GetDaughterId, {"candidates"} )
+          .Define("candidate_true_pid", Getters::GetTruePDG, {
                   "candidates",
                   "simMotherId",
-                  "trSimIndex",
+                  "recoGlobalSimIndex",
+                  "simPdg"
+          } )
+          .Define("candidate_true_id", Getters::GetTrueId, {
+                  "candidates",
+                  "simMotherId",
+                  "recoGlobalSimIndex",
+                  "simPdg"
+          } )
+          .Define("candidate_origin_flag", Getters::GetFlag, {
+                  "candidates",
+                  "simMotherId",
+                  "recoGlobalSimIndex",
                   "simPdg"
           } )
           ;
+
+  //ddd.Foreach([](ULong64_t evtId){if (evtId % 100 == 0) cout << "\t" << evtId << "\n";}, {"rdfentry_"});
+  
   auto fields = ddd.GetColumnNames();
-  std::vector<std::string> exclude_fields{"candidates", "primary_vtx", "primary_vtx", "is_good_track"};
+  std::vector<std::string> exclude_fields{"pdg_vector", "candidates", "primary_vtx", "is_good_track_lambda"};
   std::vector<std::string> white_list{};
   for(const auto& field : fields){
     if( std::find(exclude_fields.begin(), exclude_fields.end(), field) != exclude_fields.end() )
@@ -104,4 +139,6 @@ void k_short(std::string list){
     std::cout << field << "\n";
   ddd.Snapshot("t", "candidates.root", white_list );
 
+  timer.Stop();
+  timer.Print();
 }

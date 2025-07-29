@@ -38,7 +38,6 @@ void lambda(std::string list){
           .Define("pdg_vector", [](ROOT::VecOps::RVec<int> sim_index, ROOT::VecOps::RVec<int> sim_pdg, ROOT::VecOps::RVec<short> charge){
             std::vector<int> pdg;
             for (int i=0; i<sim_index.size(); ++i) {
-            //for( auto idx : sim_index ) {
               auto idx = sim_index.at(i);
               auto q = charge.at(i);
               if( idx < 0 ) {
@@ -49,9 +48,6 @@ void lambda(std::string list){
                 pdg.push_back(-999);
                 continue;
               }
-              //if ( q < 0 )
-              //  pdg.push_back(-211);
-              //else
               pdg.push_back(sim_pdg.at(idx));
             }
             return pdg;
