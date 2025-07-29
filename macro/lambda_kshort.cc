@@ -127,7 +127,6 @@ void lambda_kshort(std::string list){
           } )
           ;
 
-  //ddd.Foreach([](ULong64_t evtId){if (evtId % 100 == 0) cout << "\t" << evtId << "\n";}, {"rdfentry_"});
   
   auto fields = ddd.GetColumnNames();
   std::vector<std::string> exclude_fields{"pdg_vector", "candidates", "primary_vtx", "is_good_track_lambda"};
