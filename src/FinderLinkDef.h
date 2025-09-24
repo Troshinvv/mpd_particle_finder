@@ -22,5 +22,7 @@
 #pragma link C++ class ROOT::VecOps::RVec<ROOT::Math::LorentzVector<ROOT::Math::PxPyPzE4D<double> >>+;
 #pragma link C++ class ROOT::VecOps::RVec<vector<float>>+;
 #pragma link C++ class vector<ROOT::Math::LorentzVector<ROOT::Math::PtEtaPhiM4D<double> > >+;
+#pragma link C++ class ROOT::VecOps::RVec<vector<double> >+;
+#pragma link C++ class map<int,ROOT::Math::DisplacementVector3D<ROOT::Math::Cartesian3D<double>,ROOT::Math::DefaultCoordinateSystemTag> >+;
 
 #endif
