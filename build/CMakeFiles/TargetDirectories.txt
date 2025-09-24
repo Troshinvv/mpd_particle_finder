@@ -1,5 +1,0 @@
-/lustre/home/user/v/vtroshin/mpd_hyperons/mpd_particle_finder/build/CMakeFiles/Finder.dir
-/lustre/home/user/v/vtroshin/mpd_hyperons/mpd_particle_finder/build/CMakeFiles/G__Finder.dir
-/lustre/home/user/v/vtroshin/mpd_hyperons/mpd_particle_finder/build/CMakeFiles/find_candidates.dir
-/lustre/home/user/v/vtroshin/mpd_hyperons/mpd_particle_finder/build/CMakeFiles/edit_cache.dir
-/lustre/home/user/v/vtroshin/mpd_hyperons/mpd_particle_finder/build/CMakeFiles/rebuild_cache.dir
