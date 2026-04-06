@@ -1,15 +1,16 @@
-void rec_k_short_sim_qa(std::string str_efficiency_file="/lustre/home/user/v/vtroshin/mpd_hyperons/rec30_mpd_eff_map_lamb.root"){
+void rec_lambda_sim_qa_rec40(std::string str_efficiency_file="/scratch2/troshin/mpd_hyperons/Req40_lambda_eff.root"){
 std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(), "READ" )};
   TH2D* efficiency_histo{nullptr};
   efficiency_file->GetObject( "h2_pT_y_selected_signal", efficiency_histo );
   if( !efficiency_histo ){ std::cout << "Efficiency histogram cannot be retrieved from file" << std::endl; }
 	ROOT::RDataFrame d("t", "candidates.root");
 	auto dd = d
+			.Filter("centrality>10 && centrality<40")
                         .Define( "tru_pT", "std::vector<float> pT; for( auto mom : simMom ){ pT.push_back( mom.Pt() ); } return pT;")
-      .Define( "tru_y", "std::vector<float> y; for( auto mom : simMom ){ y.push_back( mom.Eta() ); } return y;")
-      .Define( "is_lambda", "simPdg ==310")
-      .Define( "is_fd_lambda", "simPdg == 310 && simMotherId != -1")
-      .Define( "is_prim_lambda", "simPdg == 310 && simMotherId == -1")
+      .Define( "tru_y", "std::vector<float> y; for( auto mom : simMom ){ y.push_back( mom.Rapidity()-0.986446 ); } return y;")
+      .Define( "is_lambda", "simPdg ==3122")
+      .Define( "is_fd_lambda", "simPdg == 3122 && simMotherId != -1")
+      .Define( "is_prim_lambda", "simPdg == 3122 && simMotherId == -1")
           .Define( "tru_phi", "std::vector<float> phi_part; for( auto mom : simMom ){ phi_part.push_back( mom.Phi() ); } return phi_part;")
           .Define("tru_v1", []( std::vector<float> phi, double psi){
             std::vector<float> v1_true;
@@ -38,7 +39,7 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
           .Define("is_range",[](ROOT::VecOps::RVec<int> is_part,std::vector<float> pt, std::vector<float> eta){
              std::vector<int> in_range;
              for(int i=0;i<pt.size();i++){
-               if(is_part.at(i)!=1 || pt.at(i)<0.5 || pt.at(i)>3){
+               if(is_part.at(i)!=1 || pt.at(i)<0.5 || pt.at(i)>2){
                  in_range.push_back(0);}
                else{
                  in_range.push_back(1);}
@@ -48,7 +49,7 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
          .Define("is_fd_range",[](ROOT::VecOps::RVec<int> is_part,std::vector<float> pt, std::vector<float> eta){
              std::vector<int> in_range;
              for(int i=0;i<pt.size();i++){
-               if(is_part.at(i)!=1 || pt.at(i)<0.5 || pt.at(i)>3){
+               if(is_part.at(i)!=1 || pt.at(i)<0.5 || pt.at(i)>2){
                  in_range.push_back(0);}
                else{
                  in_range.push_back(1);}
@@ -58,18 +59,31 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
          .Define("is_prim_range",[](ROOT::VecOps::RVec<int> is_part,std::vector<float> pt, std::vector<float> eta){
              std::vector<int> in_range;
              for(int i=0;i<pt.size();i++){
-               if(is_part.at(i)!=1 || pt.at(i)<0.5 || pt.at(i)>3){
+               if(is_part.at(i)!=1 || pt.at(i)<0.5 || pt.at(i)>2){
                  in_range.push_back(0);}
                else{
                  in_range.push_back(1);}
              }
              return in_range;
          }, {"is_prim_lambda","tru_pT","tru_y"})
-
+	.Define("is_prim_range2",[](ROOT::VecOps::RVec<int> is_part,std::vector<float> pt, std::vector<float> eta){
+             std::vector<int> in_range;
+             for(int i=0;i<pt.size();i++){
+               if(is_part.at(i)!=1 || pt.at(i)<0.5 || pt.at(i)>2 || eta.at(i)>0 || eta.at(i)<-0.5){
+                 in_range.push_back(0);}
+               else{
+		
+                 in_range.push_back(1);}
+             }
+             return in_range;
+         }, {"is_prim_lambda","tru_pT","tru_y"})
+	.Define("FHCalX", "std::vector<float> pos_x; for( auto pos : fhcalModPos ){ pos_x.push_back( pos.X() ); } return pos_x;")
+	.Define("FHCalY", "std::vector<float> pos_y; for( auto pos : fhcalModPos ){ pos_y.push_back( pos.Y() ); } return pos_y;")
+	.Define("FHCalZ", "std::vector<float> pos_z; for( auto pos : fhcalModPos ){ pos_z.push_back( pos.Z() ); } return pos_z;")
       .Define("candidate_p", "std::vector<float> p; for( auto mom : candidate_momenta ){ p.push_back( mom.P() ); } return p;")
 			.Define( "candidate_pT", "std::vector<float> pT; for( auto mom : candidate_momenta ){ pT.push_back( mom.Pt() ); } return pT;")
 			.Define("candidate_phi", "std::vector<float> phi; for( auto mom : candidate_momenta ){ phi.push_back( mom.Phi() ); } return phi;")
-			.Define("candidate_rapidity", "std::vector<float> rapidity; for( auto mom : candidate_momenta ){ rapidity.push_back( mom.Eta() ); } return rapidity;")
+			.Define("candidate_rapidity", "std::vector<float> rapidity; for( auto mom : candidate_momenta ){ rapidity.push_back( mom.Rapidity()-0.986446 ); } return rapidity;")
 			.Define("pT_err", "std::vector<float> err; for( auto mom : candidate_momentum_errors ){ err.push_back( mom.at(0) ); } return err;")
 			.Define("phi_err", "std::vector<float> err; for( auto mom : candidate_momentum_errors ){ err.push_back( mom.at(1) ); } return err;")
 			.Define("eta_err", "std::vector<float> err; for( auto mom : candidate_momentum_errors ){ err.push_back( mom.at(2) ); } return err;")
@@ -77,7 +91,23 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
 			.Define("daughter1_cos", "std::vector<float> cosine; for( int i=0; i<daughter_cosines.at(0).size(); ++i ){ cosine.push_back( daughter_cosines.at(0).at(i) ); } return cosine;")
 			.Define("daughter2_cos", "std::vector<float> cosine; for( int i=0; i<daughter_cosines.at(1).size(); ++i ){ cosine.push_back( daughter_cosines.at(1).at(i) ); } return cosine;")
 			.Define("daughter1_chi2_prim", "std::vector<float> chi2; for( int i=0; i<daughter_chi2_prim.at(0).size(); ++i ){ chi2.push_back( daughter_chi2_prim.at(0).at(i) ); } return chi2;")
-			.Define("daughter2_chi2_prim", "std::vector<float> chi2; for( int i=0; i<daughter_chi2_prim.at(1).size(); ++i ){ chi2.push_back( daughter_chi2_prim.at(1).at(i) ); } return chi2;")                        
+			.Define("daughter2_chi2_prim", "std::vector<float> chi2; for( int i=0; i<daughter_chi2_prim.at(1).size(); ++i ){ chi2.push_back( daughter_chi2_prim.at(1).at(i) ); } return chi2;")
+			.Define("daughter1_pdg","std::vector<float> pdg; for(int i=0;i<daughter_chi2_prim.at(0).size(); ++i ){int id1 = daughter_id.at(0).at(i); pdg.push_back(simPdg.at(recoGlobalSimIndex.at(id1)));} return pdg;")
+			.Define("daughter2_pdg","std::vector<float> pdg; for(int i=0;i<daughter_chi2_prim.at(0).size(); ++i ){int id1 = daughter_id.at(1).at(i); pdg.push_back(simPdg.at(recoGlobalSimIndex.at(id1)));} return pdg;")
+			.Define("daughter1_pt","std::vector<float> pt; for(int i=0;i<daughter_chi2_prim.at(0).size(); ++i ){int id1 = daughter_id.at(0).at(i); pt.push_back(simMom.at(recoGlobalSimIndex.at(id1)).Pt());} return pt;")
+			.Define("daughter2_pt","std::vector<float> pt; for(int i=0;i<daughter_chi2_prim.at(0).size(); ++i ){int id1 = daughter_id.at(1).at(i); pt.push_back(simMom.at(recoGlobalSimIndex.at(id1)).Pt());} return pt;")
+			.Define("daughter1_mid","std::vector<float> pdg; for(int i=0;i<daughter_chi2_prim.at(0).size(); ++i ){int id1 = daughter_id.at(0).at(i); pdg.push_back(simMotherId.at(recoGlobalSimIndex.at(id1)));} return pdg;")
+                        .Define("daughter2_mid","std::vector<float> pdg; for(int i=0;i<daughter_chi2_prim.at(0).size(); ++i ){int id1 = daughter_id.at(1).at(i); pdg.push_back(simMotherId.at(recoGlobalSimIndex.at(id1)));} return pdg;")
+			.Define("daughter1_dca","std::vector<float> dca; for(int i=0;i<daughter_chi2_prim.at(0).size(); ++i ){int id1 = daughter_id.at(0).at(i); dca.push_back(recoGlobalDca.at(id1).R());} return dca;")
+                        .Define("daughter2_dca","std::vector<float> dca; for(int i=0;i<daughter_chi2_prim.at(0).size(); ++i ){int id1 = daughter_id.at(1).at(i); dca.push_back(recoGlobalDca.at(id1).R());} return dca;")			
+
+                        .Define("candidate_diffphi", "std::vector<float> diff; for( auto phi : candidate_phiprot ){ diff.push_back(phi-mcRP); } return diff;")
+			.Define("candidate_sin_diffphi", "std::vector<float> diff; for( auto phi : candidate_phiprot ){ diff.push_back(TMath::Sin(phi-mcRP)); } return diff;")
+			.Define("candidate_A0_corr", "std::vector<float> A0; for( auto theta : candidate_thetaprot ){ A0.push_back(TMath::Sin(theta)); } return A0;")
+			.Define("candidate_diffphi_phiprot", "std::vector<float> diff; for( int i=0;i<candidate_phi.size();i++ ){ float phi=candidate_phi.at(i)-candidate_phiprot.at(i);if(phi<0) phi+=2*TMath::Pi(); diff.push_back( phi); } return diff;")
+			.Define("candidate_mc_sin_diffphi", "std::vector<float> diff; for( auto phi : candidate_mc_phiprot ){ diff.push_back(TMath::Sin(phi-mcRP)); } return diff;")
+			.Define("candidate_mc_A0_corr", "std::vector<float> A0; for( auto theta : candidate_mc_thetaprot ){ A0.push_back(TMath::Sin(theta)); } return A0;")
+                        .Define("candidate_mc_diffphi_phiprot", "std::vector<float> diff; for( int i=0;i<candidate_phi.size();i++ ){ float phi=candidate_phi.at(i)-candidate_mc_phiprot.at(i);if(phi<0) phi+=2*TMath::Pi(); diff.push_back( phi); } return diff;")
       .Define( "candidate_weight", [efficiency_histo](std::vector<float> vec_y, std::vector<float> vec_pT){
                   if( !efficiency_histo ){
                       return std::vector<float>(vec_y.size(), 1);
@@ -95,13 +125,15 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
                   }
                   return vec_weight;
             }, {"candidate_rapidity", "candidate_pT"} )
-                        .Define("signal", "candidate_true_pid == 310 && candidate_true_id == -1")
-                        .Define("background", "candidate_true_pid != 310")
-                         .Define("feed_down", "candidate_true_pid == 310 && candidate_true_id != -1")
+                        .Define("signal", "candidate_true_pid == 3122 && candidate_true_id == -1 && candidate_mc_phiprot!=-999 && candidate_mc_thetaprot!=-999")
+			.Define("signal_orig", "candidate_true_pid == 3122 && candidate_true_id == -1 && candidate_UniGen_flag==-3")
+			.Define("signal_enhanced", "candidate_true_pid == 3122 && candidate_true_id == -1 && (candidate_UniGen_flag==-9 || candidate_UniGen_flag==-15)")
+                        .Define("background", "candidate_true_pid != 3122")
+                         .Define("feed_down", "candidate_true_pid == 3122 && candidate_true_id != -1")
           .Define("under_the_peak",
                         "std::vector<double> under;"
                                         "for(int i=0; i<daughter_chi2_prim.at(0).size(); ++i){"
-                                                "if( candidate_mass.at(i) >0.52 || candidate_mass.at(i) <0.48){"
+                                                "if( candidate_mass.at(i) >1.13 || candidate_mass.at(i) <1.1){"
                                                            "under.push_back(0);"
                                                         "continue;"
                                                            "}"
@@ -119,7 +151,11 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
                                                        "basic_var.push_back(0);"
                                                        "continue;"
                                                  "}"*/
-                                                "if( daughter1_chi2_prim.at(i) < 100 ){"
+						"if( candidate_UniGen_flag.at(i) == -900 && candidate_true_id.at(i) != -1 ){"
+                                                        "basic_var.push_back(0);"
+                                                        "continue;"
+                                                "}"
+						"if( daughter1_chi2_prim.at(i) < 200 ){"
                                                         "basic_var.push_back(0);"
                                                         "continue;"
                                                 "}"
@@ -127,38 +163,66 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
                                                         "basic_var.push_back(0);"
                                                         "continue;"
                                                 "}"
-                                                "if( candidate_L.at(i) < 1 ){"
+                                                "if( candidate_L.at(i) < 5 ){"
                                                         "basic_var.push_back(0);"
                                                         "continue;"
                                                 "}"
-                                                "if( candidate_LdL.at(i) < 15 ){"
+                                                "if( candidate_LdL.at(i) < 30 ){"
                                                         "basic_var.push_back(0);"
                                                         "continue;"
                                                 "}"
-                                                "if( candidate_cos_topo.at(i) < 0.995){"
+                                                "if( candidate_cos_topo.at(i) < 0.999){"
                                                         "basic_var.push_back(0);"
                                                         "continue;"
                                                 "}"
-                                                "if( candidate_chi2_topo.at(i) > 100 ){"
+                                              /*  "if( candidate_chi2_topo.at(i) > 100 ){"
+                                                        "basic_var.push_back(0);"
+                                                        "continue;"
+                                                "}"*/
+                                               /* "if( candidate_chi2_geo.at(i) >100  ){"
+                                                        "basic_var.push_back(0);"
+                                                        "continue;"
+                                                "}"*/
+                                                "if( daughter_dca.at(i) > 2  ){"
                                                         "basic_var.push_back(0);"
                                                         "continue;"
                                                 "}"
-                                                "if( candidate_chi2_geo.at(i) >100  ){"
+						"if( daughter2_cos.at(i) > 0.999){"
                                                         "basic_var.push_back(0);"
                                                         "continue;"
                                                 "}"
-                                                "if( daughter_dca.at(i) > 1  ){"
+						"if( daughter1_cos.at(i) > 0.99 || daughter1_cos.at(i)<0.4){"
                                                         "basic_var.push_back(0);"
                                                         "continue;"
                                                 "}"
-                                                "if( candidate_rapidity.at(i) > 1.2 || candidate_rapidity.at(i) < -1.2 || candidate_pT.at(i)<0.5 || candidate_pT.at(i)>3 ){"
+						"if( m_err.at(i) > 0.004 || m_err.at(i) < 0.0008  ){"
                                                         "basic_var.push_back(0);"
                                                         "continue;"
                                                 "}"
-                                                "basic_var.push_back(1 );"
+                            /*                    "if( candidate_pT.at(i)<0.5 || candidate_pT.at(i)>2 ){"
+                                                        "basic_var.push_back(0);"
+                                                        "continue;"
+                                                "}"*/
+						"if( daughter1_dca.at(i) <2){"
+                                                        "basic_var.push_back(0);"
+                                                        "continue;"
+                                                "}"
+                                                "if( daughter2_dca.at(i) <1){"
+                                                        "basic_var.push_back(0);"
+                                                        "continue;"
+                                                "}"
+				/*		"if( daughter1_mid.at(i) ==-1){"
+                                                        "basic_var.push_back(0);"
+                                                        "continue;"
+                                                "}"
+						"if( daughter2_mid.at(i) ==-1){"
+                                                        "basic_var.push_back(0);"
+                                                        "continue;"
+                                                "}"*/
+                                                "basic_var.push_back(candidate_weight.at(i) );"
                                         "} return basic_var;"
                         )
-            .Define("selected_signal",
+			.Define("selected_signal",
                         "std::vector<int> selected_signal;"
                         " for(int i=0; i<basic_var.size(); ++i )"
                         "{ "
@@ -170,9 +234,130 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
                                         "selected_signal.push_back(0);"
                                         "continue;"
                                 "}"
-                                "selected_signal.push_back( 1 );"
+                                "selected_signal.push_back( basic_var.at(i) );"
                         "}"
                         " return selected_signal;")
+			.Define("var_eta_1",
+				"std::vector<float> var_eta;"
+				" for(int i=0; i<basic_var.size(); ++i )"
+                        "{ "
+                                "if( candidate_rapidity.at(i)<-1.2 || candidate_rapidity.at(i)>-0.8 ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "if( basic_var.at(i) == 0  ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "var_eta.push_back( basic_var.at(i) );"
+                        "}"
+                        " return var_eta;")
+			.Define("var_eta_2",
+                                "std::vector<float> var_eta;"
+                                " for(int i=0; i<basic_var.size(); ++i )"
+                        "{ "
+                                "if( candidate_rapidity.at(i)<-0.8 || candidate_rapidity.at(i)>-0.4 ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "if( basic_var.at(i) == 0 ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "var_eta.push_back( basic_var.at(i) );"
+                        "}"
+                        " return var_eta;")
+			.Define("var_eta_3",
+                                "std::vector<float> var_eta;"
+                                " for(int i=0; i<basic_var.size(); ++i )"
+                        "{ "
+                                "if( candidate_rapidity.at(i)<-0.4 || candidate_rapidity.at(i)>0 ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "if( basic_var.at(i) == 0 ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "var_eta.push_back( basic_var.at(i) );"
+                        "}"
+                        " return var_eta;")
+			.Define("var_eta_4",
+                                "std::vector<float> var_eta;"
+                                " for(int i=0; i<basic_var.size(); ++i )"
+                        "{ "
+                                "if( candidate_rapidity.at(i)<0 || candidate_rapidity.at(i)>0.4 ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "if( basic_var.at(i) == 0  ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "var_eta.push_back( basic_var.at(i) );"
+                        "}"
+                        " return var_eta;")
+			.Define("var_eta_5",
+                                "std::vector<float> var_eta;"
+                                " for(int i=0; i<basic_var.size(); ++i )"
+                        "{ "
+                                "if( candidate_rapidity.at(i)<0.4 || candidate_rapidity.at(i)>0.8 ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "if( basic_var.at(i) == 0  ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "var_eta.push_back( basic_var.at(i) );"
+                        "}"
+                        " return var_eta;")
+			.Define("var_eta_6",
+                                "std::vector<float> var_eta;"
+                                " for(int i=0; i<basic_var.size(); ++i )"
+                        "{ "
+                                "if( candidate_rapidity.at(i)<0.8 || candidate_rapidity.at(i)>1.2 ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "if( basic_var.at(i) == 0  ){"
+                                        "var_eta.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "var_eta.push_back( basic_var.at(i) );"
+                        "}"
+                        " return var_eta;")
+			 .Define("selected_signal_orig",
+                        "std::vector<int> selected_signal1;"
+                        " for(int i=0; i<basic_var.size(); ++i )"
+                        "{ "
+                                "if( signal_orig.at(i) == 0 ){"
+                                        "selected_signal1.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "if( basic_var.at(i) == 0 ){"
+                                        "selected_signal1.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "selected_signal1.push_back( 1 );"
+                        "}"
+                        " return selected_signal1;")
+			 .Define("selected_signal_enhanced",
+                        "std::vector<int> selected_signal2;"
+                        " for(int i=0; i<basic_var.size(); ++i )"
+                        "{ "
+                                "if( signal_enhanced.at(i) == 0 ){"
+                                        "selected_signal2.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "if( basic_var.at(i) == 0 ){"
+                                        "selected_signal2.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "selected_signal2.push_back( 1 );"
+                        "}"
+                        " return selected_signal2;")
+
                         .Define("selected_background",
                         "std::vector<int> selected_background;"
                         " for(int i=0; i<basic_var.size(); ++i )"
@@ -185,7 +370,7 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
                                         "selected_background.push_back(0);"
                                         "continue;"
                                 "}"
-                                "selected_background.push_back( 1 );"
+                                "selected_background.push_back( basic_var.at(i) );"
                         "}"
                         " return selected_background;")
 
@@ -198,6 +383,10 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
                                         "continue;"
                                 "}"
                                 "if( under_the_peak.at(i) == 0 ){"
+                                        "under_signal.push_back(0);"
+                                        "continue;"
+                                "}"
+                                "if( basic_var.at(i) == 0 ){"
                                         "under_signal.push_back(0);"
                                         "continue;"
                                 "}"
@@ -217,6 +406,10 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
                                         "continue;"
                                 "}"
                                 "if( under_the_peak.at(i) == 0 ){"
+                                        "under_background.push_back(0);"
+                                        "continue;"
+                                "}"
+                                 "if( basic_var.at(i) == 0 ){"
                                         "under_background.push_back(0);"
                                         "continue;"
                                 "}"
@@ -370,18 +563,40 @@ std::unique_ptr<TFile> efficiency_file{TFile::Open( str_efficiency_file.c_str(),
 	std::vector<ROOT::RDF::RResultPtr<::TH1D>> hist1d;
 	std::vector<ROOT::RDF::RResultPtr<::TH2D>> hist2d;
         std::vector<ROOT::RDF::RResultPtr<::TH3D>> hist3d;
+	std::vector<ROOT::RDF::RResultPtr<::THnD>> hist4d;
+
+std::vector<double> gapsvec;
+std::vector<double> gapphivec;
         double gaps[21];
         for(int i=0;i<21;i++){
-gaps[i]=(0.6-0.4)/20*i +0.4;
+gaps[i]=(1.15-1.09)/20*i +1.09;
+gapsvec.push_back(gaps[i]);
+}
+double gapphi[9];
+for(int i=0;i<9;i++){
+gapphi[i]=TMath::Pi()*2/8*i;
+gapphivec.push_back(gapphi[i]);
 }
 //double gappt[7]={0,0.25,0.5,0.75,1.0,1.5,2.0};
 //double gapy[13]={-0.2,-0.1,0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0};
-double gappt[9]={0,0.2,0.5,0.8,1.0,1.2,1.5,2.0,3.0};
-double gapy[7]={-1.2,-0.8,-0.4,0,0.4,0.8,1.2};
-        std::vector<std::string> cuts{ "signal", "background", "basic_var", "selected_signal", "selected_background","under_signal","under_background"/*,"feed_down","selected_feed_down","background_2","background_3","background_4","background_5","background_6", "background_other"*/ };
+double gappt[8]={0,0.2,0.5,0.8,1.0,1.2,1.5,2.0};
+//double gapy[9]={-1.2,-0.8,-0.5,-0.3,0,0.3,0.5,0.8,1.2};
+double gapy[7]={-1.2,-0.8,-0.4,0.,0.4,0.8,1.2};
+double gapy_v[9]={-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0.,0.2,0.4};
+double gapy_p[6]={-0.6,-0.4,-0.2,0.,0.2,0.4};
+std::vector<double> gapyvec_v={-1.5,-1.,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0.,0.2,0.4};
+std::vector<double> gapyvec_p={-1.5,-1,-0.8,-0.6,-0.4,-0.2,0.,0.2,0.4};
+std::vector<double> gapcentvec={0,5,10,20,30,40,50,60,80,100};
+std::vector<double> gapptvec={0,0.2,0.5,0.8,1.0,1.2,1.5,2.0};
+std::vector<double> gapptvec2={0.5,2.0};
+std::vector<double> gapyvec={-1.2,-0.8,-0.4,0.,0.4,0.8,1.2};
+std::vector<double> gapA0vec={-1.,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,0.,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.};
+        std::vector<std::string> cuts{ "signal", "background", "basic_var", "selected_signal", "selected_background"/*,"under_signal","under_background"*//*,"feed_down","selected_feed_down","background_2","background_3","background_4","background_5","background_6"*//*, "signal_orig","signal_enhanced","selected_signal_orig","selected_signal_enhanced"*//*,"var_eta_1","var_eta_2","var_eta_3","var_eta_4","var_eta_5","var_eta_6"*/ };
+	std::vector<std::string> cuts_eta{"var_eta_1","var_eta_2","var_eta_3","var_eta_4","var_eta_5","var_eta_6"};
 
-
-	hist1d.push_back( dd.Histo1D( { "h1_mass", ";m (GeV/c^2); counts", 100, 0.4, 0.6 }, "candidate_mass" ) );
+	hist2d.push_back( dd.Histo2D( { "h1_fhcalz", ";", 800, -400, 400,100,0,100 }, "FHCalZ","fhcalModId" ) );
+	hist2d.push_back( dd.Histo2D( { "h1_fhcalxy", ";", 400, -200, 200,400,-200,200 }, "FHCalX","FHCalY" ) );
+	hist1d.push_back( dd.Histo1D( { "h1_mass", ";m (GeV/c^2); counts", 100, 1.05, 1.25 }, "candidate_mass" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_pT", ";p_{T} (GeV/c); counts", 100, -1.00, 5.0 }, "candidate_pT" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_phi", ";#varphi (rad); counts", 100, -3.50, 3.5 }, "candidate_phi" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_rapdity", ";y_{lab}; counts", 100, -3, 3 }, "candidate_rapidity" ) );
@@ -401,39 +616,48 @@ double gapy[7]={-1.2,-0.8,-0.4,0,0.4,0.8,1.2};
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_L", ";L; counts", 200, -20.0, 20.0 }, "candidate_L" ) );
 	hist1d.push_back( dd.Histo1D( { "h1_candidate_LdL", ";L/dL; counts", 200, -20.0, 20.0 }, "candidate_LdL" ) );
 	hist2d.push_back( dd.Histo2D( { "h2_pT_y", ";y;p_{T} (GeV/c)", 120, -3.0, 3.0, 60, 0.0, 3  }, "candidate_rapidity", "candidate_pT" ) );
-        hist2d.push_back( dd.Histo2D( { "h2_tru_pT_tru_y", ";y;p_{T} (GeV/c)",120, -3.0, 3.0, 60, 0.0, 3 }, "tru_y", "tru_pT", "is_lambda" ) );
+        hist2d.push_back( dd.Histo2D( { "h2_tru_pT_tru_y", ";y;p_{T} (GeV/c)",120, -3.0, 3.0, 60, 0.0, 3 }, "tru_y", "tru_pT", "is_prim_lambda" ) );
         hist2d.push_back( dd.Histo2D( { "h2_fd_tru_pT_tru_y", ";y;p_{T} (GeV/c)", 120, -3.0, 3.0, 60, 0.0, 3 }, "tru_y", "tru_pT", "is_fd_lambda" ) );
+
+	hist1d.push_back( dd.Histo1D( { "h1_candidate_UniGen_flag_raw", ";unigen flag; counts", 3000, -1000, 2000 }, "candidate_UniGen_flag" ) );
 
 hist1d.push_back( dd.Histo1D( { "h1_psi_rp", ";psi_rp counts", 500, -8, 8 }, "mcRP" ) );
 
        
- hist2d.push_back( dd.Histo2D( { "h2_m_err_m_inv", ";#Deltam (GeV/c^2);m_inv (GeV/c^2)", 100, 0.0, 0.01, 100, 0.4, 0.6  }, "m_err", "candidate_mass" ) );
- hist2d.push_back( dd.Histo2D( { "h2_pi_chi2_prim_m_inv", ";#chi^{2}_{prim}^{1};m_inv (GeV/c^2)", 100, 0.0, 300, 100, 0.4, 0.6  }, "daughter1_chi2_prim", "candidate_mass" ) );       
- hist2d.push_back( dd.Histo2D( { "h2_chi2_topo_m_inv", ";#chi^{2}_{topo};m_inv (GeV/c^2)", 100, 0.0, 100, 100, 0.4, 0.6  }, "candidate_chi2_topo", "candidate_mass" ) );
-hist2d.push_back( dd.Histo2D( { "h2_p_chi2_prim_m_inv", ";#chi^{2}_{prim}^{2};m_inv (GeV/c^2)", 100, 0.0, 100, 100, 0.4, 0.6  }, "daughter2_chi2_prim", "candidate_mass" ) );
-hist2d.push_back( dd.Histo2D( { "h2_cos_p_lam_m_inv", ";cos(#varphi_{2});m_inv (GeV/c^2)", 100, 0.98, 1, 100, 0.4, 0.6  }, "daughter2_cos", "candidate_mass" ) );
-hist2d.push_back( dd.Histo2D( { "h2_dca_m_inv", ";DCA;m_inv (GeV/c^2)", 200, 0.0, 2, 100, 0.4, 0.6  }, "daughter_dca", "candidate_mass" ) );
-hist2d.push_back( dd.Histo2D( { "h2_chi2_geo_m_inv", ";#chi^{2}_{geo};m_inv (GeV/c^2)", 50, 0.0, 100, 100, 0.4, 0.6  }, "candidate_chi2_geo", "candidate_mass" ) );
-hist2d.push_back( dd.Histo2D( { "h2_L_m_inv", ";L;m_inv (GeV/c^2)", 160, -20.0, 20, 100, 0.4, 0.6  }, "candidate_L", "candidate_mass" ) );
-hist2d.push_back( dd.Histo2D( { "h2_LdL_m_inv", ";L/dL;m_inv (GeV/c^2)", 320, -40.0, 40, 100, 0.4, 0.6  }, "candidate_LdL", "candidate_mass" ) );
-hist2d.push_back( dd.Histo2D( { "h2_cos_topo_m_inv", ";r_{#lambda}p_{#lambda};m_inv (GeV/c^2)", 100, 0.98, 1, 100, 0.4, 0.6  }, "candidate_cos_topo", "candidate_mass" ) );
+ hist2d.push_back( dd.Histo2D( { "h2_m_err_m_inv", ";#Deltam (GeV/c^2);m_inv (GeV/c^2)", 100, 0.0, 0.01, 100, 1.05, 1.25  }, "m_err", "candidate_mass" ) );
+ hist2d.push_back( dd.Histo2D( { "h2_pi_chi2_prim_m_inv", ";#chi^{2}_{prim}^{1};m_inv (GeV/c^2)", 100, 0.0, 300, 100, 1.05, 1.25  }, "daughter1_chi2_prim", "candidate_mass" ) );       
+ hist2d.push_back( dd.Histo2D( { "h2_chi2_topo_m_inv", ";#chi^{2}_{topo};m_inv (GeV/c^2)", 100, 0.0, 100, 100, 1.05, 1.25  }, "candidate_chi2_topo", "candidate_mass" ) );
+hist2d.push_back( dd.Histo2D( { "h2_p_chi2_prim_m_inv", ";#chi^{2}_{prim}^{2};m_inv (GeV/c^2)", 100, 0.0, 100, 100, 1.05, 1.25  }, "daughter2_chi2_prim", "candidate_mass" ) );
+hist2d.push_back( dd.Histo2D( { "h2_cos_p_lam_m_inv", ";cos(#varphi_{2});m_inv (GeV/c^2)", 100, 0.98, 1, 100, 1.05, 1.25  }, "daughter2_cos", "candidate_mass" ) );
+hist2d.push_back( dd.Histo2D( { "h2_dca_m_inv", ";DCA;m_inv (GeV/c^2)", 200, 0.0, 2, 100, 1.05, 1.25  }, "daughter_dca", "candidate_mass" ) );
+hist2d.push_back( dd.Histo2D( { "h2_chi2_geo_m_inv", ";#chi^{2}_{geo};m_inv (GeV/c^2)", 50, 0.0, 100, 100, 1.05, 1.25  }, "candidate_chi2_geo", "candidate_mass" ) );
+hist2d.push_back( dd.Histo2D( { "h2_L_m_inv", ";L;m_inv (GeV/c^2)", 160, -20.0, 20, 100, 1.05, 1.25  }, "candidate_L", "candidate_mass" ) );
+hist2d.push_back( dd.Histo2D( { "h2_LdL_m_inv", ";L/dL;m_inv (GeV/c^2)", 320, -40.0, 40, 100, 1.05, 1.25  }, "candidate_LdL", "candidate_mass" ) );
+hist2d.push_back( dd.Histo2D( { "h2_cos_topo_m_inv", ";r_{#lambda}p_{#lambda};m_inv (GeV/c^2)", 100, 0.98, 1, 100, 1.05, 1.25  }, "candidate_cos_topo", "candidate_mass" ) );
 
-hist1d.push_back( dd.Profile1D( { "prof1d_tru_v1_vs_y", ";y_{cm};v_{1}", 20,-2,2 },"tru_y", "tru_v1", "is_range" ) );
-hist1d.push_back( dd.Profile1D( { "prof1d_tru_v2_vs_pT", ";p_{T} GeV/c;v_{2}", 20,0,3 },"tru_pT", "tru_v2", "is_v2_range" ) );
-hist1d.push_back( dd.Profile1D( { "prof1d_tru_fd_v1_vs_y", ";y_{cm};v_{1}", 20,-2,2 },"tru_y", "tru_v1", "is_fd_range" ) );
-hist1d.push_back( dd.Profile1D( { "prof1d_tru_prim_v1_vs_y", ";y_{cm};v_{1}", 20,-2,2 },"tru_y", "tru_v1", "is_prim_range" ) );
+hist1d.push_back( dd.Profile1D( { "prof1d_tru_v1_vs_y", ";y_{cm};v_{1}", 24,-1.2,1.2 },"tru_y", "tru_v1", "is_range" ) );
+hist1d.push_back( dd.Profile1D( { "prof1d_tru_v2_vs_pT", ";p_{T} GeV/c;v_{2}", 12,0,3 },"tru_pT", "tru_v2", "is_v2_range" ) );
+hist1d.push_back( dd.Profile1D( { "prof1d_tru_fd_v1_vs_y", ";y_{cm};v_{1}", 24,-1.2,1.2 },"tru_y", "tru_v1", "is_fd_range" ) );
+hist1d.push_back( dd.Profile1D( { "prof1d_tru_prim_v1_vs_y", ";y_{cm};v_{1}", 24,-1.2,1.2 },"tru_y", "tru_v1", "is_prim_range" ) );
+hist1d.push_back( dd.Profile1D( { "prof1d_tru_prim_v1_vs_pT", ";p_{T} GeV/c;v_{1}", 12,0,2 },"tru_pT", "tru_v1", "is_prim_range2" ) );
+hist1d.push_back( dd.Profile1D( { "prof1d_tru_prim_v1_vs_cent", ";centrality %;v_{1}", 20,0,100 },"centrality", "tru_v1", "is_prim_range2" ) );
+hist1d.push_back( dd.Profile1D( { "prof1d_tru_prim_cent_vs_y", ";y_{cm};centrality", 24,-1.2,1.2 },"tru_y", "centrality", "is_prim_range" ) );
+
 
 	for( auto cut : cuts ){
-		hist1d.push_back( dd.Histo1D( { std::data("h1_mass_"+cut), ";m (GeV/c^2); counts", 300, 0.4, 0.6 }, "candidate_mass", cut ) );
+		hist1d.push_back( dd.Histo1D( { std::data("h1_mass_"+cut), ";m (GeV/c^2); counts", 300, 1.05, 1.25 }, "candidate_mass", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_pT_"+cut), ";p_{T} (GeV/c); counts", 100, 0.00, 5.0 }, "candidate_pT", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_phi_"+cut), ";#varphi (rad); counts", 100, -3.50, 3.5 }, "candidate_phi", cut ) );
+			                        hist1d.push_back( dd.Histo1D( { std::data("h1_phi_prot_"+cut), ";#varphi (rad); counts", 100, -3.5, 3.5 }, "candidate_diffphi", cut ) );
+				hist1d.push_back( dd.Histo1D( { std::data("h1_diff_phi_"+cut), ";#varphi (rad); counts", 100, -7, 7 }, "candidate_diffphi_phiprot", cut ) );
+
 			hist1d.push_back( dd.Histo1D( { std::data("h1_rapdity_"+cut), ";y_{lab}; counts", 100, -3, 3 }, "candidate_rapidity", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_pT_err_"+cut), ";#Deltap_{T}; counts", 100, 0.0, 0.1 }, "pT_err", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_phi_err_"+cut), ";#Delta#varphi; counts", 100, 0.0, 0.1 }, "phi_err", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_eta_err_"+cut), ";#Delta#eta; counts", 100, 0.0, 0.1 }, "eta_err", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_mass_err_"+cut), ";#Deltam; counts", 100, 0.0, 0.05 }, "m_err", cut ) );
-			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter1_cos_"+cut), ";cos(#varphi_{1}); counts", 1000, -1, 1.0 }, "daughter1_cos", cut ) );
-			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_cos_"+cut), ";cos(#varphi_{2}); counts", 1000, -1, 1.0 }, "daughter2_cos", cut ) );
+			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter1_cos_"+cut), ";cos(#varphi_{1}); counts", 100, 0.8, 1.0 }, "daughter1_cos", cut ) );
+			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_cos_"+cut), ";cos(#varphi_{2}); counts", 100, 0.8, 1.0 }, "daughter2_cos", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter1_chi2_prim_"+cut), ";#chi^{2}_{prim}^{1}; counts", 500, 0.0, 1000.0 }, "daughter1_chi2_prim", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_chi2_prim_"+cut), ";#chi^{2}_{prim}^{2}; counts", 150, 0.0, 300.0 }, "daughter2_chi2_prim", cut ) );
 			hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_chi2_geo_"+cut), ";#chi^{2}_{geo}; counts", 100, 0.0, 100.0 }, "candidate_chi2_geo", cut ) );
@@ -446,22 +670,42 @@ hist1d.push_back( dd.Profile1D( { "prof1d_tru_prim_v1_vs_y", ";y_{cm};v_{1}", 20
 hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_true_pid_"+cut), ";pid; counts", 20000, -10000, 10000 }, "candidate_true_pid", cut ) );
 hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_true_id_"+cut), ";id; counts", 20000, -10000, 10000 }, "candidate_true_id", cut ) );
 hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_origin_flag_"+cut), ";origin flag; counts", 20, -10, 10 }, "candidate_origin_flag", cut ) );
+hist1d.push_back( dd.Histo1D( { std::data("h1_candidate_UniGen_flag_"+cut), ";unigen flag; counts", 3000, -1000, 2000 }, "candidate_UniGen_flag", cut ) );
 			hist2d.push_back( dd.Histo2D( { std::data("h2_pT_y_"+cut), ";y;p_{T} (GeV/c)", 120, -3, 3.0, 60, 0.0, 3  }, "candidate_rapidity", "candidate_pT", cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2__candidate_pt_simpt_"+cut), ";simpT;pT", 20, 0.0, 2, 20, 0, 2  }, "candidate_true_pt", "candidate_pT",cut ) );
+
+hist1d.push_back( dd.Histo1D( { std::data("h1_daughter1_pdg_"+cut), ";pdg; counts", 20000, -10000, 10000 }, "daughter1_pdg", cut ) );
+                        hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_pdg_"+cut), ";pid; counts", 20000, -10000, 10000 }, "daughter2_pdg", cut ) );
+hist1d.push_back( dd.Histo1D( { std::data("h1_daughter1_pt_"+cut), ";pt; GeV/c", 100, 0, 2.0 }, "daughter1_pt", cut ) );
+                        hist1d.push_back( dd.Histo1D( { std::data("h1_daughter2_pt_"+cut), ";pt; GeV/c", 100, 0, 2 }, "daughter2_pt", cut ) );
 
 
-hist2d.push_back( dd.Histo2D( { std::data("h2_m_err_m_inv"+cut), ";#Deltam (GeV/c^2);m_inv (GeV/c^2)", 100, 0.0, 0.01, 100, 0.4, 0.6  }, "m_err", "candidate_mass",cut ) );
- hist2d.push_back( dd.Histo2D( { std::data("h2_pi_chi2_prim_m_inv"+cut), ";#chi^{2}_{prim}^{1};m_inv (GeV/c^2)", 10000, 0, 10000, 100, 0.4, 0.6  }, "daughter1_chi2_prim", "candidate_mass",cut ) );       
- hist2d.push_back( dd.Histo2D( { std::data("h2_chi2_topo_m_inv"+cut), ";#chi^{2}_{topo};m_inv (GeV/c^2)", 200, 0.0, 200, 100, 0.4, 0.6  }, "candidate_chi2_topo", "candidate_mass",cut ) );
-hist2d.push_back( dd.Histo2D( { std::data("h2_p_chi2_prim_m_inv"+cut), ";#chi^{2}_{prim}^{2};m_inv (GeV/c^2)", 1000, 0, 1000, 100, 0.4, 0.6  }, "daughter2_chi2_prim", "candidate_mass",cut ) );
-hist2d.push_back( dd.Histo2D( { std::data("h2_cos_p_lam_m_inv"+cut), ";cos(#varphi_{2});m_inv (GeV/c^2)", 1000, -1, 1, 100, 0.4, 0.6  }, "daughter2_cos", "candidate_mass",cut ) );
-hist2d.push_back( dd.Histo2D( { std::data("h2_dca_m_inv"+cut), ";DCA;m_inv (GeV/c^2)", 200, 0.0, 2, 100, 0.4, 0.6  }, "daughter_dca", "candidate_mass",cut ) );
-hist2d.push_back( dd.Histo2D( { std::data("h2_chi2_geo_m_inv"+cut), ";#chi^{2}_{geo};m_inv (GeV/c^2)", 100, 0.0, 100, 100, 0.4, 0.6  }, "candidate_chi2_geo", "candidate_mass",cut ) );
-hist2d.push_back( dd.Histo2D( { std::data("h2_L_m_inv"+cut), ";L;m_inv (GeV/c^2)", 200, -50.0, 50, 100, 0.4, 0.6  }, "candidate_L", "candidate_mass",cut ) );
-hist2d.push_back( dd.Histo2D( { std::data("h2_LdL_m_inv"+cut), ";L/dL;m_inv (GeV/c^2)", 400, -100.0, 100, 100, 0.4, 0.6  }, "candidate_LdL", "candidate_mass",cut ) );
-hist2d.push_back( dd.Histo2D( { std::data("h2_cos_topo_m_inv"+cut), ";r_{#lambda}p_{#lambda};m_inv (GeV/c^2)", 1000, 0.99, 1, 100, 0.4, 0.6  }, "candidate_cos_topo", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_m_err_m_inv"+cut), ";#Deltam (GeV/c^2);m_inv (GeV/c^2)", 100, 0.0, 0.01, 100, 1.05, 1.25  }, "m_err", "candidate_mass",cut ) );
+ hist2d.push_back( dd.Histo2D( { std::data("h2_pi_chi2_prim_m_inv"+cut), ";#chi^{2}_{prim}^{1};m_inv (GeV/c^2)", 10000, 0, 10000, 100, 1.05, 1.25  }, "daughter1_chi2_prim", "candidate_mass",cut ) );       
+ hist2d.push_back( dd.Histo2D( { std::data("h2_chi2_topo_m_inv"+cut), ";#chi^{2}_{topo};m_inv (GeV/c^2)", 200, 0.0, 200, 100, 1.05, 1.25  }, "candidate_chi2_topo", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_p_chi2_prim_m_inv"+cut), ";#chi^{2}_{prim}^{2};m_inv (GeV/c^2)", 1000, 0, 1000, 100, 1.05, 1.25  }, "daughter2_chi2_prim", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_cos_p_lam_m_inv"+cut), ";cos(#varphi_{2});m_inv (GeV/c^2)", 1000, 0.99, 1, 100, 1.05, 1.25  }, "daughter2_cos", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_cos_pion_lam_m_inv"+cut), ";cos(#varphi_{1});m_inv (GeV/c^2)", 10000, -1, 1, 100, 1.05, 1.25  }, "daughter1_cos", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_dca_m_inv"+cut), ";DCA;m_inv (GeV/c^2)", 200, 0.0, 2, 100, 1.05, 1.25  }, "daughter_dca", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_chi2_geo_m_inv"+cut), ";#chi^{2}_{geo};m_inv (GeV/c^2)", 100, 0.0, 100, 100, 1.05, 1.25  }, "candidate_chi2_geo", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_L_m_inv"+cut), ";L;m_inv (GeV/c^2)", 200, -50.0, 50, 100, 1.05, 1.25  }, "candidate_L", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_LdL_m_inv"+cut), ";L/dL;m_inv (GeV/c^2)", 400, -100.0, 100, 100, 1.05, 1.25  }, "candidate_LdL", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_cos_topo_m_inv"+cut), ";r_{#lambda}p_{#lambda};m_inv (GeV/c^2)", 1000, 0.99, 1, 100, 1.05, 1.25  }, "candidate_cos_topo", "candidate_mass",cut ) );
 
-hist3d.push_back( dd.Histo3D( { std::data("h1_mass_pt_eta_"+cut),";m (GeV/c^2); p_{T} (GeV/c);#eta",20,gaps,8,gappt,6,gapy}, "candidate_mass", "candidate_pT","candidate_rapidity", cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_daugh1_dca_m_inv"+cut), ";DCA;m_inv (GeV/c^2)", 200, 0.0, 10, 100, 1.05, 1.25  }, "daughter1_dca", "candidate_mass",cut ) );
+hist2d.push_back( dd.Histo2D( { std::data("h2_daugh2_dca_m_inv"+cut), ";DCA;m_inv (GeV/c^2)", 200, 0.0, 10, 100, 1.05, 1.25  }, "daughter2_dca", "candidate_mass",cut ) );
+
+//hist3d.push_back( dd.Histo3D( { std::data("h1_mass_pt_eta_"+cut),";m (GeV/c^2); p_{T} (GeV/c);#eta",20,gaps,7,gappt,8,gapy_v}, "candidate_mass", "candidate_pT","candidate_rapidity", cut ) );
+hist4d.push_back( dd.HistoND( { std::data("hN_mass_pt_eta_cent_"+cut),";m (GeV/c^2); p_{T} (GeV/c);#eta;centrality %",4,{20,7,10,9},{gapsvec,gapptvec,gapyvec_v,gapcentvec}},{ "candidate_mass", "candidate_pT","candidate_rapidity","centrality", cut} ) );
+hist4d.push_back( dd.HistoND( { std::data("hN_mass_pt_eta_delta_cent_"+cut),";m (GeV/c^2); p_{T} (GeV/c);#eta;delta phi;centeality %",5,{20,1,8,8,9},{gapsvec,gapptvec2,gapyvec_p,gapphivec,gapcentvec}},{ "candidate_mass", "candidate_pT","candidate_rapidity","candidate_diffphi_phiprot","centrality", cut} ) );
+
+//hist3d.push_back( dd.Histo3D( { std::data("h3_mass_eta_delta_"+cut),";m (GeV/c^2);#eta;delta phi",20,gaps,5,gapy_p,8,gapphi}, "candidate_mass","candidate_rapidity","candidate_diffphi_phiprot", cut ) );
+//hist4d.push_back( dd.HistoND( { std::data("hN_mass_eta_delta_A0"+cut),";m (GeV/c^2);#eta;delta phi;A0",4,{20,8,16,20},{gapsvec,gapyvec_d,gapphivec,gapA0vec}},{ "candidate_mass", "candidate_rapidity","candidate_diffphi_phiprot","candidate_A0_corr", cut} ) );
 	}
+/*for( auto cut : cuts_eta ){
+hist2d.push_back( dd.Profile2D( { std::data("p2_sin_mass_delta_eta1_"+cut), ";m (GeV/c^2);delta phi;sin(#phi^{*}-#Psi_{1})", 20,1.09,1.15,16,0,TMath::Pi()*2,-1,1  },"candidate_mass","candidate_mc_diffphi_phiprot","candidate_mc_sin_diffphi" ,cut ) );
+}*/
+
 	auto file_out = TFile::Open("rec_lambda_sim_qa.root", "recreate");
 	for( auto& h1 : hist1d )
 		h1->Write();
@@ -469,6 +713,8 @@ hist3d.push_back( dd.Histo3D( { std::data("h1_mass_pt_eta_"+cut),";m (GeV/c^2); 
 		h2->Write();
         for( auto& h3 : hist3d )
                 h3->Write();
+	for( auto& h4 : hist4d )
+                h4->Write();
 	file_out->Close();
      //   auto ddd=dd.Filter("basic_var==1");
      //   ddd.Snapshot("t", "selected_lamb_candidates.root");
